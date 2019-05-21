@@ -27,13 +27,17 @@
 					"adr.templates.repo": {
 						"type" : "string",
 						"description": "Git repo for downloading ADR templates",
-						"default" : "https://github.com/vincent-ledu/adr-template.git",
-						"scope": "application"
+						"default" : "https://github.com/vincent-ledu/adr-template.git"
+					},
+					"adr.templates.directory": {
+						"type" : "string",
+						"description": "Git repo for downloading ADR templates",
+						"default" : "./.adr-templates"
 					},
 					"adr.project.directory": {
 						"type": "string",
 						"description": "Folder to store ADR for a project",
-						"default": "${workspaceRoot}/doc/adr"
+						"default": "./doc/adr"
 					}
 				}
 			}
