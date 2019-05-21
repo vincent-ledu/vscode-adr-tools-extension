@@ -1,0 +1,78 @@
+{
+	"name": "adr-tools",
+	"displayName": "adr-tools",
+	"description": "Architecture Decision Records tool",
+	"version": "0.0.1",
+	"publisher": "Vincent Le Dû",
+	"license": "MIT",
+	"engines": {
+		"vscode": "^1.34.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onCommand:extension.adr-init",
+		"onCommand:extension.adr-new",
+		"onCommand:extension.adr-link",
+		"onCommand:extension.adr-config",
+		"onCommand:extension.adr-help"
+	],
+	"main": "./extension.js",
+	"contributes": {
+		"configuration": [
+			{ 
+				"title": "Configuration for ADR templates",
+				"properties": {
+					"adr.templates.repo": {
+						"type" : "string",
+						"description": "Git repo for downloading ADR templates",
+						"default" : "https://github.com/vincent-ledu/adr-template.git",
+						"scope": "application"
+					},
+					"adr.project.directory": {
+						"type": "string",
+						"description": "Folder to store ADR for a project",
+						"default": "${workspaceRoot}/doc/adr"
+					}
+				}
+			}
+		],
+		"commands": [
+			{
+				"command": "extension.adr-init",
+				"title": "ADR Init"
+			},
+			{
+				"command": "extension.adr-new",
+				"title": "ADR New"
+			},
+			{
+				"command": "extension.adr-link",
+				"title": "ADR Link"
+			},
+			{
+				"command": "extension.adr-config",
+				"title": "ADR Config"
+			},
+			{
+				"command": "extension.adr-help",
+				"title": "ADR Help"
+			}
+		]
+	},
+	"scripts": {
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"test": "node ./node_modules/vscode/bin/test"
+	},
+	"devDependencies": {
+		"typescript": "^3.3.1",
+		"vscode": "^1.1.28",
+		"eslint": "^5.13.0",
+		"@types/node": "^10.12.21",
+		"@types/mocha": "^2.2.42"
+	},
+	"dependencies": {
+		"mustache": "^3.0.1"
+	}
+}
