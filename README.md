@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/vincent-ledu/vscode-adr-tools-extension.svg?branch=master)](https://travis-ci.org/vincent-ledu/vscode-adr-tools-extension)
 # ADR tools for Visual Studio Code
 
 This is an extension for Visual Studio Code, to apply Architecture Decision Records.
