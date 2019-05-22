@@ -118,7 +118,7 @@ function addNode(adrPath, src) {
   output += "click " + srcIndex + ' "' + src + '"\n';
 
   let graph = { "nodes" : []};
-  graph.nodes.add(JSON.parse('"{"index": "0001","name": "my_adr", "title": "My Title", "createdDate":"2019-05-22"}"')));
+  graph.nodes.add(JSON.parse('"{"index": "0001","name": "my_adr", "title": "My Title", "createdDate":"2019-05-22"}"'));
 
   fs.appendFile(adrPath + path.sep + "adr_flow_chart.md", output, err => {
     if (err) {
