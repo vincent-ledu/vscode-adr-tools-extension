@@ -1,0 +1,18 @@
+{
+  "nodes": [
+    {
+      "index": "0001",
+      "name": "my_adr",
+      "title": "My Title"
+    },
+    {
+      "index": "0002",
+      "name": "my_adr",
+      "title": "My Title"
+    }
+  ],
+  "links": [
+      {"src":"0001", "tgt": "0002", "type": "Amended by", "createdDate": "2019-05-22"},
+      {"src":"0002", "tgt": "0001", "type": "Amends"}
+  ]
+}

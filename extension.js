@@ -54,8 +54,8 @@ function activate(context) {
 
 	disposable = vscode.commands.registerCommand('extension.adr-new', () => {
 
-		let adrFolder = vscode.workspace.getConfiguration().get("adr.project.directory");
-		let adrTemplateFolder = vscode.workspace.getConfiguration().get("adr.templates.directory");
+		let adrFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get("adr.project.directory"));
+		let adrTemplateFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get("adr.templates.directory"));
 		vscode.window.showInputBox({prompt: 'Enter new ADR name', placeHolder: 'Choose database'}).then(srcAdrName => {
 			if (!srcAdrName) return;
 			vscode.window.showQuickPick(["None", "Supersedes", "Amends"], { prompt: 'Select if there is a relation with existing ADR' }).then(linkType => {
@@ -63,11 +63,11 @@ function activate(context) {
 				if (!(linkType === "None")) {
 					vscode.window.showQuickPick(adrUtils.getAllAdr(adrFolder), {prompt: 'Enter target ADR name', placeHolder: 'Choose database'}).then(tgtAdrName => {
 						if (!tgtAdrName) return;
-						let doc = adrUtils.createNewAdr(vscode.workspace.rootPath, srcAdrName, linkType, tgtAdrName, adrFolder, adrTemplateFolder);
-						vscode.window.showTextDocument(doc);
+						let filepath = adrUtils.createNewAdr(srcAdrName, linkType, tgtAdrName, adrFolder, adrTemplateFolder);
+						vscode.workspace.openTextDocument(filepath).then(doc => vscode.window.showTextDocument(doc));
 					});
 				} else {
-					let filepath = adrUtils.createNewAdr(vscode.workspace.rootPath, srcAdrName, null, null, adrFolder, adrTemplateFolder);
+					let filepath = adrUtils.createNewAdr(srcAdrName, null, null, adrFolder, adrTemplateFolder);
 					vscode.workspace.openTextDocument(filepath).then(doc => vscode.window.showTextDocument(doc));
 				}
 			});
@@ -77,8 +77,7 @@ function activate(context) {
 
 	disposable = vscode.commands.registerCommand('extension.adr-link', () => {
 
-		let adrFolder = vscode.workspace.getConfiguration().get("adr.project.directory");
-		let adrTemplateFolder = vscode.workspace.getConfiguration().get("adr.templates.repo");
+		let adrFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get("adr.project.directory"));
 		vscode.window.showQuickPick(adrUtils.getAllAdr(adrFolder), {prompt: 'Enter source ADR name', placeHolder: 'Choose database'}).then(srcAdrName => {
 			if (!srcAdrName) return ;
 			vscode.window.showQuickPick(["Supersedes", "Amends"], { prompt: 'Select if there is a relation with existing ADR' }).then(linkType => {
@@ -98,27 +97,6 @@ function activate(context) {
 	
 			});
 	
-		});
-	});
-	context.subscriptions.push(disposable);
-
-	disposable = vscode.commands.registerCommand('extension.adr-config', () => {
-		let configuredAdrProjectDirectory = vscode.workspace.getConfiguration().get("adr.project.directory");	
-		vscode.window.showQuickPick([configuredAdrProjectDirectory],
-			{prompt: 'Enter your adr templates git repo url:', 
-			placeHolder: 'https://yourGitRepoWithADRTemplates'})
-			.then(adrProjectDirectory => {
-				if (!adrProjectDirectory) return ;
-				let configuredTemplateRepo = vscode.workspace.getConfiguration().get("adr.templates.repo");
-				vscode.window.showQuickPick([configuredTemplateRepo],
-					{prompt: 'Enter your adr templates git repo url:', 
-					placeHolder: 'https://yourGitRepoWithADRTemplates'})
-					.then(adrTemplateGitRepo => {
-						if (!adrTemplateGitRepo) return ;
-						vscode.workspace.getConfiguration().update("adr.project.directory", adrProjectDirectory, vscode.ConfigurationTarget.WorkspaceFolder);
-						vscode.workspace.getConfiguration().update("adr.templates.repo", adrTemplateGitRepo, vscode.ConfigurationTarget.WorkspaceFolder);
-						vscode.window.showInformationMessage('ADR Config');
-			});
 		});
 	});
 	context.subscriptions.push(disposable);

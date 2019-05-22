@@ -6,45 +6,104 @@
 //
 
 // The module 'assert' provides assertion methods from node
-const assert = require('assert');
+const assert = require("assert");
 
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
-const vscode = require('vscode');
-const fs = require('fs');
-const path = require('path');
+const vscode = require("vscode");
+const fs = require("fs");
+const path = require("path");
 // const myExtension = require('../extension');
-const adrUtils = require('../adr-utils');
+const adrUtils = require("../adr-utils");
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Extension Tests", function() {
-	let adrPath = vscode.workspace.rootPath + path.sep + 'adr';
-	let adrTemplatePath = vscode.workspace.rootPath + path.sep + '.adr-templates';
+  let adrPath = vscode.workspace
+    .getConfiguration()
+    .get("adr.project.directory");
+  let adrTemplatePath = vscode.workspace
+    .getConfiguration()
+    .get("adr.templates.directory");
 
-	// Defines a Mocha unit test
-	test("adr init", function() {
-		fs.rmdir(adrPath, (err) => {
-			if (err)
-				console.log("directory " + adrPath + " does not exist.");
-		});
-		fs.rmdir(adrTemplatePath, (err) => {
-			if (err)
-				console.log("directory " + adrTemplatePath + " does not exist.");
-		});
-		
-		assert.equal([1, 2, 3].indexOf(4), -1);
+  // Defines a Mocha unit test
+  test("adr init", function() {
+    adrUtils.init(
+      vscode.workspace.rootPath,
+      adrPath,
+      adrTemplatePath,
+      vscode.workspace.getConfiguration().get("adr.templates.repo")
+    );
+    assert.equal(
+      fs.accessSync(
+        path.join(vscode.workspace.rootPath, adrPath),
+        fs.constants.F_OK
+      ),
+      undefined
+    );
+    assert.equal(
+      fs.accessSync(
+        path.join(vscode.workspace.rootPath, adrTemplatePath),
+        fs.constants.F_OK
+      ),
+      undefined
+    );
+    assert.equal(
+      typeof adrUtils.getAllAdr(path.join(vscode.workspace.rootPath, adrPath)),
+      typeof [""]
+    );
+  });
 
-		// adrUtils.init(adrPath, adrTemplatePath);
-		// assert.equal(fs.accessSync(adrPath, fs.constants.F_OK), undefined);
-		// assert.equal(fs.accessSync(adrTemplatePath, fs.constants.F_OK), undefined);
-		// assert.equal(typeof(adrUtils.getAllAdr(adrPath)), typeof([""]));
-		
-	});
+  test("adr new", function() {
+    let adr1 = adrUtils.createNewAdr(
+      "mytest1adr",
+      null,
+      null,
+      path.join(vscode.workspace.rootPath, adrPath),
+      path.join(vscode.workspace.rootPath, adrTemplatePath)
+    );
+    let adr2 = adrUtils.createNewAdr(
+      "mytest2adr",
+      "Supersedes",
+      "0001-mytest1adr.md",
+      path.join(vscode.workspace.rootPath, adrPath),
+      path.join(vscode.workspace.rootPath, adrTemplatePath)
+    );
+    let adr3 = adrUtils.createNewAdr(
+      "mytest3adr",
+      "Amends",
+      "0002-mytest2adr.md",
+      path.join(vscode.workspace.rootPath, adrPath),
+      path.join(vscode.workspace.rootPath, adrTemplatePath)
+    );
 
-	test("adr new", function() {
-		// adrUtils.createNewAdr("mytest1adr", null , null, adrPath, adrTemplatePath);
-		// adrUtils.createNewAdr("mytest2adr", "Supersedes", "0001-mytest1adr.md", adrPath, adrTemplatePath);
-		// adrUtils.createNewAdr("mytest3adr", "Amends", "0002-mytest2adr.md", adrPath, adrTemplatePath);
-		// assert.equal(fs.existsSync(adrPath + path.sep + "0001-mytest1adr.md"), true);
-	});
+    assert.equal(fs.existsSync(adr1), true);
+    assert.equal(fs.existsSync(adr2), true);
+    assert.equal(fs.existsSync(adr3), true);
+  });
+
+  test("adr link", function() {
+    let srcFilePath = adrUtils.createNewAdr(
+      "mytest4adr",
+      null,
+      null,
+      path.join(vscode.workspace.rootPath, adrPath),
+      path.join(vscode.workspace.rootPath, adrTemplatePath)
+    );
+    let tgtFilePath = adrUtils.createNewAdr(
+      "mytest4adr",
+      null,
+      null,
+      path.join(vscode.workspace.rootPath, adrPath),
+      path.join(vscode.workspace.rootPath, adrTemplatePath)
+    );
+
+    adrUtils.addLink("0005-mytest4adr.md", srcFilePath, "Amendeds");
+    adrUtils.addLink("0004-mytest5adr.md", tgtFilePath, "Amended by");
+    assert.equal(fs.existsSync(srcFilePath), true);
+    assert.equal(fs.existsSync(tgtFilePath), true);
+    let data = fs.readFileSync(tgtFilePath);
+    assert.equal(data.includes("Amended by 0004-mytest4adr.md") >= 0, true);
+    data = fs.readFileSync(srcFilePath);
+    assert.equal(data.includes("Amends 0005-mytest4adr.md") >= 0, true);
+  });
 });
