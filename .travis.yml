@@ -5,6 +5,7 @@ node_js:
 
 os:
   - osx
+  - linux
 
 before_install:
   - if [ $TRAVIS_OS_NAME == "linux" ]; then
