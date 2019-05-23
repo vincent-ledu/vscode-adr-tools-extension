@@ -21,9 +21,7 @@ function adrInit() {
         })
         .then(adrTemplateGitRepo => {
           if (!adrTemplateGitRepo) return;
-          let configuredTemplateDirectory = path.normalize(
-            vscode.workspace.getConfiguration().get("adr.templates.directory")
-          );
+          let configuredTemplateDirectory = path.normalize(vscode.workspace.getConfiguration().get("adr.templates.directory"));
           vscode.window
             .showInputBox({
               value: configuredTemplateDirectory,
@@ -35,15 +33,9 @@ function adrInit() {
               console.log("adr.project.directory", adrProjectDirectory);
               console.log("adr.templates.directory", adrTemplateDirectory);
               console.log("adr.templates.repo", adrTemplateGitRepo);
-              vscode.workspace
-                .getConfiguration()
-                .update("adr.project.directory", adrProjectDirectory, vscode.ConfigurationTarget.Workspace);
-              vscode.workspace
-                .getConfiguration()
-                .update("adr.templates.directory", adrTemplateDirectory, vscode.ConfigurationTarget.Workspace);
-              vscode.workspace
-                .getConfiguration()
-                .update("adr.templates.repo", adrTemplateGitRepo, vscode.ConfigurationTarget.Workspace);
+              vscode.workspace.getConfiguration().update("adr.project.directory", adrProjectDirectory, vscode.ConfigurationTarget.Workspace);
+              vscode.workspace.getConfiguration().update("adr.templates.directory", adrTemplateDirectory, vscode.ConfigurationTarget.Workspace);
+              vscode.workspace.getConfiguration().update("adr.templates.repo", adrTemplateGitRepo, vscode.ConfigurationTarget.Workspace);
               let basedir = vscode.workspace.rootPath;
               adrUtils.init(basedir, adrProjectDirectory, adrTemplateDirectory, adrTemplateGitRepo);
               vscode.window.showInformationMessage("ADR Init");
@@ -53,14 +45,8 @@ function adrInit() {
 }
 
 function adrNew() {
-  let adrFolder = path.join(
-    vscode.workspace.rootPath,
-    vscode.workspace.getConfiguration().get("adr.project.directory")
-  );
-  let adrTemplateFolder = path.join(
-    vscode.workspace.rootPath,
-    vscode.workspace.getConfiguration().get("adr.templates.directory")
-  );
+  let adrFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get("adr.project.directory"));
+  let adrTemplateFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get("adr.templates.directory"));
   vscode.window
     .showInputBox({
       prompt: "Enter new ADR name",
@@ -94,10 +80,7 @@ function adrNew() {
 }
 
 function adrLink() {
-  let adrFolder = path.join(
-    vscode.workspace.rootPath,
-    vscode.workspace.getConfiguration().get("adr.project.directory")
-  );
+  let adrFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get("adr.project.directory"));
   vscode.window
     .showQuickPick(adrUtils.getAllAdr(adrFolder), {
       prompt: "Enter source ADR name",
