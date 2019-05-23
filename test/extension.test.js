@@ -14,7 +14,7 @@ const vscode = require("vscode");
 const fs = require("fs");
 const path = require("path");
 // const myExtension = require('../extension');
-const adrUtils = require("../adr-utils");
+const adrUtils = require("../adrfunc/adr-utils");
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Extension Tests", function() {
