@@ -27,6 +27,10 @@ suite("Extension Tests", function() {
 
   // Defines a Mocha unit test
   test("adr init", function() {
+    console.log("typeof vscode.workspace.rootPath:"+typeof(vscode.workspace.rootPath));
+    console.log("typeof adrPath:"+typeof(adrPath));
+    console.log("typeof adrTemplatePath:"+typeof(adrTemplatePath));
+    console.log("typeof vscode.workspace.getConfiguration().get(\"adr.templates.repo\"):"+typeof(vscode.workspace.getConfiguration().get("adr.templates.repo")));
     adrUtils.init(
       vscode.workspace.rootPath,
       adrPath,

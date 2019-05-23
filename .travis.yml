@@ -20,7 +20,7 @@ install:
 before_script:
   - npm run clean
 script:
-  - npm test --silent
+  - npm test
 
 env:
   global:
