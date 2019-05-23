@@ -4,7 +4,6 @@ node_js:
   - 10
 
 os:
-  - osx
   - linux
 
 before_install:
@@ -27,7 +26,7 @@ env:
   global:
     secure: poryPvmCmsXPEAHcB0vLY8rOfoj9Hry6L6xun0MRxPX86S/TkNdWDNNYPSy4ertzFoBRbtnxW1aL8vuTF5oLjvA5bmmYjFFDmkqWO40Rjyrion8E/cf3EoasP7H2qPP+VehiEaX94ICF7K6WcPMq3H+k0erSaK5T9lLR8ReEkpPm99IGlo5MntYOimyvKaAQmmvDOtWvLrfqDXbDi14BJl07JgtAFhNcjEX9wRWvCkNUeuj/AoLlosrm93SysfB7CJZ6ck33TQC+uJrT2kSQzGF9mbEoL5lNkBPDlLoQ4p++Sgxtqrqn04J3nm/sf+hEnNEjecE0ueYqYHITx7m9e1grvmC219Dukbxozt6NNRzog0WMQmQgvQmtatOsAJQ/GhdPOmlwXhVX0eCTSVNYy8T1pV6Ot4vN77f9SPLvvspT0zcT86Yo/srUL/rkYt5s9HiWLlQcyVQ9FFwKRXSEdukk8lXwZAjkbul/ons7xavn31a6kHi27jNGdUaabRgZyqiokVZB3AT1M8J9I7wB3UnPtmVl31vVYEcYQ/M2pquzgQuU4ZlnpKa/RvTllHXUZDrC0Wb6PEZwIeKjLFLvj01qgLaXzaJgOad16/zCt80ztFYUtiiumbNoPwBVL9tED+dEI+ME1F2387F6yH+ze07K42nNVO1naBkKVMf41zk=
 
-defore_deploy:
+before_deploy:
   - npm install -g vsce;
   - vsce package;
 
