@@ -27,57 +27,65 @@ suite("Extension Tests", function() {
 
   // Defines a Mocha unit test
   test("adr init", function() {
+    let rootPath = vscode.workspace.rootPath;
+    if (typeof rootPath === 'undefined') {
+      rootPath = "./testworkspace";
+    }
     console.log("typeof vscode.workspace.rootPath:"+typeof(vscode.workspace.rootPath));
     console.log("typeof adrPath:"+typeof(adrPath));
     console.log("typeof adrTemplatePath:"+typeof(adrTemplatePath));
     console.log("typeof vscode.workspace.getConfiguration().get(\"adr.templates.repo\"):"+typeof(vscode.workspace.getConfiguration().get("adr.templates.repo")));
     adrUtils.init(
-      vscode.workspace.rootPath,
+      rootPath,
       adrPath,
       adrTemplatePath,
       vscode.workspace.getConfiguration().get("adr.templates.repo")
     );
     assert.equal(
       fs.accessSync(
-        path.join(vscode.workspace.rootPath, adrPath),
+        path.join(rootPath, adrPath),
         fs.constants.F_OK
       ),
       undefined
     );
     assert.equal(
       fs.accessSync(
-        path.join(vscode.workspace.rootPath, adrTemplatePath),
+        path.join(rootPath, adrTemplatePath),
         fs.constants.F_OK
       ),
       undefined
     );
     assert.equal(
-      typeof adrUtils.getAllAdr(path.join(vscode.workspace.rootPath, adrPath)),
+      typeof adrUtils.getAllAdr(path.join(rootPath, adrPath)),
       typeof [""]
     );
   });
 
   test("adr new", function() {
+    let rootPath = vscode.workspace.rootPath;
+    if (typeof rootPath === 'undefined') {
+      rootPath = "./testworkspace";
+    }
     let adr1 = adrUtils.createNewAdr(
       "mytest1adr",
       null,
       null,
-      path.join(vscode.workspace.rootPath, adrPath),
-      path.join(vscode.workspace.rootPath, adrTemplatePath)
+      path.join(rootPath, adrPath),
+      path.join(rootPath, adrTemplatePath)
     );
     let adr2 = adrUtils.createNewAdr(
       "mytest2adr",
       "Supersedes",
       "0001-mytest1adr.md",
-      path.join(vscode.workspace.rootPath, adrPath),
-      path.join(vscode.workspace.rootPath, adrTemplatePath)
+      path.join(rootPath, adrPath),
+      path.join(rootPath, adrTemplatePath)
     );
     let adr3 = adrUtils.createNewAdr(
       "mytest3adr",
       "Amends",
       "0002-mytest2adr.md",
-      path.join(vscode.workspace.rootPath, adrPath),
-      path.join(vscode.workspace.rootPath, adrTemplatePath)
+      path.join(rootPath, adrPath),
+      path.join(rootPath, adrTemplatePath)
     );
 
     assert.equal(fs.existsSync(adr1), true);
@@ -86,19 +94,23 @@ suite("Extension Tests", function() {
   });
 
   test("adr link", function() {
+    let rootPath = vscode.workspace.rootPath;
+    if (typeof rootPath === 'undefined') {
+      rootPath = "./testworkspace";
+    }
     let srcFilePath = adrUtils.createNewAdr(
       "mytest4adr",
       null,
       null,
-      path.join(vscode.workspace.rootPath, adrPath),
-      path.join(vscode.workspace.rootPath, adrTemplatePath)
+      path.join(rootPath, adrPath),
+      path.join(rootPath, adrTemplatePath)
     );
     let tgtFilePath = adrUtils.createNewAdr(
       "mytest4adr",
       null,
       null,
-      path.join(vscode.workspace.rootPath, adrPath),
-      path.join(vscode.workspace.rootPath, adrTemplatePath)
+      path.join(rootPath, adrPath),
+      path.join(rootPath, adrTemplatePath)
     );
 
     adrUtils.addLink("0005-mytest4adr.md", srcFilePath, "Amendeds");
