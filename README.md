@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/vincent-ledu/vscode-adr-tools-extension.svg?branch=master)](https://travis-ci.org/vincent-ledu/vscode-adr-tools-extension)
+[![Known Vulnerabilities](https://snyk.io/test/github/vincent-ledu/vscode-adr-tools-extension/badge.svg)](https://snyk.io/test/github/vincent-ledu/vscode-adr-tools-extension)
 [![Maintainability](https://api.codeclimate.com/v1/badges/57f0818005519ef011ae/maintainability)](https://codeclimate.com/github/vincent-ledu/vscode-adr-tools-extension/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/57f0818005519ef011ae/test_coverage)](https://codeclimate.com/github/vincent-ledu/vscode-adr-tools-extension/test_coverage)
+
 # ADR tools for Visual Studio Code
 
 This is an extension for Visual Studio Code, to apply Architecture Decision Records.
@@ -26,6 +28,13 @@ This extension contributes the following settings:
 This is a pre-release, for first users feedback.
 
 ## Release Notes
+
+### 0.0.2
+
+Bugs fixes:
+* Fix bugs on creating linked ADR.
+Technical:
+* Finalize travis CI/CD (build on linux, publish to marketplace)
 
 ### 0.0.1
 
