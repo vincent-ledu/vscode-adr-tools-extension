@@ -1,12 +1,12 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
 function sanitizedAdrName(adrName) {
   return adrName
     .toLowerCase()
-    .replace(/ /g, "_")
-    .replace(/'/, "_")
-    .replace(/-/g, "_");
+    .replace(/ /g, '_')
+    .replace(/'/, '_')
+    .replace(/-/g, '_');
 }
 
 function getAllAdr(adrPath) {
@@ -15,51 +15,53 @@ function getAllAdr(adrPath) {
 }
 
 function createNewAdr(srcAdrName, linkType, tgtAdrName, adrPath, adrTemplatePath) {
-  const mustache = require("mustache");
-  console.log("create new adr " + srcAdrName + " in " + adrPath + " from templatepath " + adrTemplatePath);
+  const mustache = require('mustache');
+  console.log(
+    'create new adr ' + srcAdrName + ' in ' + adrPath + ' from templatepath ' + adrTemplatePath
+  );
   var lastIndex = -1;
-  let srcAdrSanitizeName = "";
+  let srcAdrSanitizeName = '';
   let files = fs.readdirSync(adrPath);
   files.forEach(file => {
-    var index = parseInt(file.split("-")[0]);
+    var index = parseInt(file.split('-')[0]);
     if (isNaN(index)) {
       index = 0;
     }
     lastIndex = Math.max(lastIndex, index);
   });
-  console.log("lastindex:" + lastIndex);
-  lastIndex = "" + (lastIndex + 1);
+  console.log('lastindex:' + lastIndex);
+  lastIndex = '' + (lastIndex + 1);
   let options = {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric"
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   };
-  var data = "";
+  var data = '';
   let d = new Date();
   data = {
-    date: d.toLocaleDateString("en-EN", options),
-    status: "Accepted",
-    "adr-index": lastIndex,
-    "adr-name": "" + srcAdrName + ""
+    date: d.toLocaleDateString('en-EN', options),
+    status: 'Accepted',
+    'adr-index': lastIndex,
+    'adr-name': '' + srcAdrName + '',
   };
-  srcAdrSanitizeName = lastIndex.padStart(4, "0") + "-" + sanitizedAdrName(srcAdrName) + ".md";
-  if (linkType === "Supersedes" && tgtAdrName != null) {
-    data["links"] = linkType + " " + tgtAdrName;
+  srcAdrSanitizeName = lastIndex.padStart(4, '0') + '-' + sanitizedAdrName(srcAdrName) + '.md';
+  if (linkType === 'Supersedes' && tgtAdrName != null) {
+    data['links'] = linkType + ' ' + tgtAdrName;
     let tgtFilePath = adrPath + path.sep + tgtAdrName;
-    let linkedType = "Superseded by";
+    let linkedType = 'Superseded by';
     addLink(srcAdrSanitizeName, tgtFilePath, linkedType);
     addRelation(adrPath, srcAdrSanitizeName, tgtAdrName, linkType);
   } else if (linkType != null && tgtAdrName != null) {
-    data["links"] = linkType + " " + tgtAdrName;
+    data['links'] = linkType + ' ' + tgtAdrName;
     let tgtFilePath = adrPath + path.sep + tgtAdrName;
-    let linkedType = linkType.replace(/s$/, "ed by");
+    let linkedType = linkType.replace(/s$/, 'ed by');
     addLink(srcAdrSanitizeName, tgtFilePath, linkedType);
     addRelation(adrPath, srcAdrSanitizeName, tgtAdrName, linkType);
   } else {
-    addNode(adrPath, srcAdrSanitizeName);
+    addNode(adrPath, srcAdrSanitizeName, srcAdrName);
   }
-  let templateContent = fs.readFileSync(adrTemplatePath + path.sep + "index-recordname.md", "utf8");
+  let templateContent = fs.readFileSync(adrTemplatePath + path.sep + 'index-recordname.md', 'utf8');
 
   let output = mustache.render(templateContent, data);
   fs.writeFileSync(adrPath + path.sep + srcAdrSanitizeName, output);
@@ -67,76 +69,95 @@ function createNewAdr(srcAdrName, linkType, tgtAdrName, adrPath, adrTemplatePath
 }
 
 function addLink(srcAdrName, tgtFilePath, linkType) {
-  console.log("add link " + linkType + " " + srcAdrName + " to " + tgtFilePath);
-  fs.readFile(tgtFilePath, "utf8", function(err, data) {
+  console.log('add link ' + linkType + ' ' + srcAdrName + ' to ' + tgtFilePath);
+  fs.readFile(tgtFilePath, 'utf8', function(err, data) {
     if (err) {
       return console.log(err);
     }
-    var result = "";
-    if (linkType === "Superseded by") {
-      result = data.replace(/## Status([\s\S])*Accepted(\s)/, "## Status\n$1" + linkType + " " + srcAdrName);
+    var result = '';
+    if (linkType === 'Superseded by') {
+      result = data.replace(
+        /## Status([\s\S])*Accepted(\s)/,
+        '## Status\n$1' + linkType + ' ' + srcAdrName
+      );
     } else {
-      result = data.replace(/## Status([\s\S])*Accepted(\s)/, "## Status\n$1Accepted  \n" + linkType + " " + srcAdrName);
+      result = data.replace(
+        /## Status([\s\S])*Accepted(\s)/,
+        '## Status\n$1Accepted  \n' + linkType + ' ' + srcAdrName
+      );
     }
-    fs.writeFile(tgtFilePath, result, "utf8", function(err) {
+    fs.writeFile(tgtFilePath, result, 'utf8', function(err) {
       if (err) return console.log(err);
     });
   });
 }
 
-function addNode(adrPath, src) {
-  let srcIndex = src.split("-")[0];
-  let srcName = src.split("-")[1].split(".")[0];
-  let output = srcIndex + "[" + srcName + "]\n";
-  output += "click " + srcIndex + ' "' + src + '"\n';
-
-  // let graph = { "nodes" : []};
-  // graph.nodes.add(JSON.parse('"{"index": "0001","name": "my_adr", "title": "My Title", "createdDate":"2019-05-22"}"'));
-
-  fs.appendFile(adrPath + path.sep + "adr_flow_chart.md", output, err => {
+function updateFlowChart(adrPath, output) {
+  fs.appendFile(adrPath + path.sep + 'adr_flow_chart.md', output, err => {
     if (err) {
-      console.log("addRelation error: " + err);
+      console.log('updateFlowChart: ' + err);
     }
   });
 }
 
-function addRelation(adrPath, src, tgt, linkType) {
-  let srcIndex = src.split("-")[0];
-  let srcName = src.split("-")[1].split(".")[0];
-  let tgtIndex = tgt.split("-")[0];
-  let tgtName = tgt.split("-")[1].split(".")[0];
-  let output = srcIndex + "[" + srcName + "]" + " --> |" + linkType + "|" + tgtIndex + "(" + tgtName + ")\n";
-  output += "click " + srcIndex + ' "' + src + '"\n';
+function graphAddNode(index, name, title) {
+  let graph;
+  if (!fs.existsSync('./graph.json')) {
+    graph.nodes = [];
+  } else {
+    graph = require('./graph.json');
+  }
+  let node;
+  node.index = index;
+  node.name = name;
+  node.title = title;
+  graph.nodes.add(node);
+  console.log(graph);
+}
 
-  fs.appendFile(adrPath + path.sep + "adr_flow_chart.md", output, err => {
-    if (err) {
-      console.log("addRelation error: " + err);
-    }
-  });
+function addNode(adrPath, name, title) {
+  let srcIndex = name.split('-')[0];
+  let srcName = name.split('-')[1].split('.')[0];
+  let output = srcIndex + '[' + srcName + ']\n';
+  output += 'click ' + srcIndex + ' "' + name + '"\n';
+  updateFlowChart(adrPath, output);
+
+  graphAddNode(srcIndex, srcName, title);
+}
+
+function addRelation(adrPath, src, tgt, linkType) {
+  let srcIndex = src.split('-')[0];
+  let srcName = src.split('-')[1].split('.')[0];
+  let tgtIndex = tgt.split('-')[0];
+  let tgtName = tgt.split('-')[1].split('.')[0];
+  let output =
+    srcIndex + '[' + srcName + ']' + ' --> |' + linkType + '|' + tgtIndex + '(' + tgtName + ')\n';
+  output += 'click ' + srcIndex + ' "' + src + '"\n';
+  updateFlowChart(adrPath, output);
 }
 
 function mkDirByPathSync(targetDir, { isRelativeToScript = false } = {}) {
   const sep = path.sep;
-  const initDir = path.isAbsolute(targetDir) ? sep : "";
-  const baseDir = isRelativeToScript ? __dirname : ".";
+  const initDir = path.isAbsolute(targetDir) ? sep : '';
+  const baseDir = isRelativeToScript ? __dirname : '.';
 
   return targetDir.split(sep).reduce((parentDir, childDir) => {
     const curDir = path.resolve(baseDir, parentDir, childDir);
     try {
       fs.mkdirSync(curDir);
     } catch (err) {
-      if (err.code === "EEXIST") {
+      if (err.code === 'EEXIST') {
         // curDir already exists!
         return curDir;
       }
 
       // To avoid `EISDIR` error on Mac and `EACCES`-->`ENOENT` and `EPERM` on Windows.
-      if (err.code === "ENOENT") {
+      if (err.code === 'ENOENT') {
         // Throw the original parentDir error on curDir `ENOENT` failure.
         throw new Error(`EACCES: permission denied, mkdir '${parentDir}'`);
       }
 
-      const caughtErr = ["EACCES", "EPERM", "EISDIR"].indexOf(err.code) > -1;
+      const caughtErr = ['EACCES', 'EPERM', 'EISDIR'].indexOf(err.code) > -1;
       if (!caughtErr || (caughtErr && curDir === path.resolve(targetDir))) {
         throw err; // Throw if it's just the last created dir.
       }
@@ -147,20 +168,20 @@ function mkDirByPathSync(targetDir, { isRelativeToScript = false } = {}) {
 }
 
 function init(basedir, adrPath, adrTemplatePath, gitRepo) {
-  const mustach = require("mustache");
+  const mustach = require('mustache');
   adrPath = path.join(basedir, adrPath);
   adrTemplatePath = path.join(basedir, adrTemplatePath);
   if (!fs.existsSync(adrPath)) {
     mkDirByPathSync(adrPath);
-    fs.writeFileSync(adrPath + path.sep + "adr_flow_chart.md", "```\ngraph LR\n```\n");
+    fs.writeFileSync(adrPath + path.sep + 'adr_flow_chart.md', '```\ngraph LR\n```\n');
   }
   if (!fs.existsSync(adrTemplatePath)) {
     mkDirByPathSync(adrTemplatePath);
 
-    const cp = require("child_process");
-    cp.execSync("git clone " + gitRepo + " " + adrTemplatePath, function(err, stdout, stderr) {
+    const cp = require('child_process');
+    cp.execSync('git clone ' + gitRepo + ' ' + adrTemplatePath, function(err, stdout, stderr) {
       if (err) {
-        console.log("error while cloning adr template: " + err);
+        console.log('error while cloning adr template: ' + err);
       }
       console.log(`stdout: ${stdout}`);
       console.log(`stderr: ${stderr}`);
@@ -168,24 +189,27 @@ function init(basedir, adrPath, adrTemplatePath, gitRepo) {
   }
 
   let options = {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric"
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   };
-  var data = "";
+  var data = '';
   let d = new Date();
   data = {
-    date: d.toLocaleDateString("en-EN", options),
-    status: "Accepted"
+    date: d.toLocaleDateString('en-EN', options),
+    status: 'Accepted',
   };
-  let output = mustach.render(fs.readFileSync(adrTemplatePath + path.sep + "0000-record_architecture_decisions.md", "utf8"), data);
-  fs.writeFile(adrPath + path.sep + "0000-record_architecture_decisions.md", output, err => {
+  let output = mustach.render(
+    fs.readFileSync(adrTemplatePath + path.sep + '0000-record_architecture_decisions.md', 'utf8'),
+    data
+  );
+  fs.writeFile(adrPath + path.sep + '0000-record_architecture_decisions.md', output, err => {
     if (err) {
-      console.log("error while creating first adr: " + err);
+      console.log('error while creating first adr: ' + err);
     }
   });
-  addNode(adrPath, "0000-record_architecture_decisions.md");
+  addNode(adrPath, '0000-record_architecture_decisions.md');
 }
 
 exports.init = init;

@@ -3,7 +3,12 @@
     {
       "index": "0001",
       "name": "my_adr",
-      "title": "My Title"
+      "title": "My Title",
+      "statuses": [
+        {"date": "2019-05-22", "status": "Proposal"}, 
+        {"date": "2019-05-23", "status": "Accepted"}, 
+        {"date": "2019-05-30", "status": "Superseded"}, 
+      ]
     },
     {
       "index": "0002",
