@@ -33,10 +33,19 @@ describe("Graph report tests cases", function() {
   });
 
   it("should change status of a node", function() {
-    let expected = "0001";
-    let graph = graphreport.getGraph("./testworkspace");
-    graphreport.addStatus("./testworkspace", "0001", "new status", new Date("2019-06-03"));
-    graphreport.addStatus("./testworkspace", "0002", "new status", new Date("2019-06-03"));
+    let expected = new Object();
+    expected =  {
+        "index": "0001",
+        "filename": "my_adr.md",
+        "title": "My ADR",
+        "statuses": [
+          {"date": ""+new Date("2019-05-27")+"", "status": "Proposal"},
+          {"date": ""+new Date("2019-06-03")+"", "status": "new status"}
+        ]
+      };
+    let actual = graphreport.addStatus("./testworkspace", "0001", "new status", new Date("2019-06-03"));
+    assert.deepStrictEqual(actual, expected);
+    assert.equal(graphreport.addStatus("./testworkspace", "0002", "new status", new Date("2019-06-03"), undefined));
 
   });
 });
