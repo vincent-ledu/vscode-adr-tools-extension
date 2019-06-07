@@ -7,7 +7,7 @@
       "statuses": [
         {"date": "2019-05-22", "status": "Proposal"}, 
         {"date": "2019-05-23", "status": "Accepted"}, 
-        {"date": "2019-05-30", "status": "Superseded"}, 
+        {"date": "2019-05-30", "status": "Superseded"}
       ]
     },
     {
