@@ -1,120 +1,204 @@
-const vscode = require("vscode");
-const adrUtils = require("../adrfunc/adr-utils");
-const path = require("path");
+const vscode = require('vscode')
+const adrUtils = require('../adrfunc/adr-utils')
+const path = require('path')
+const parsing = require('../parsing/parsingAdr')
+const graph = require('../reports/graph')
 
-function adrInit() {
-  let configuredAdrProjectDirectory = path.normalize(vscode.workspace.getConfiguration().get("adr.project.directory"));
-  vscode.window
+async function adrInit () {
+  let configuredAdrProjectDirectory = path.normalize(vscode.workspace.getConfiguration().get('adr.project.directory'))
+  const adrProjectDirectory = await vscode.window
     .showInputBox({
       value: configuredAdrProjectDirectory,
-      prompt: "Enter your adr directory destination:",
-      placeHolder: "Your ADR folder in this workspace"
+      prompt: 'Enter your adr directory destination:',
+      placeHolder: 'Your ADR folder in this workspace'
     })
-    .then(adrProjectDirectory => {
-      if (!adrProjectDirectory) return;
-      let configuredTemplateRepo = vscode.workspace.getConfiguration().get("adr.templates.repo");
-      vscode.window
-        .showInputBox({
-          value: configuredTemplateRepo,
-          prompt: "Enter your adr templates git repo url:",
-          placeHolder: "https://yourGitRepoWithADRTemplates"
-        })
-        .then(adrTemplateGitRepo => {
-          if (!adrTemplateGitRepo) return;
-          let configuredTemplateDirectory = path.normalize(vscode.workspace.getConfiguration().get("adr.templates.directory"));
-          vscode.window
-            .showInputBox({
-              value: configuredTemplateDirectory,
-              prompt: "Enter your adr templates Directory path for this workspace:",
-              placeHolder: ".adr-templates"
-            })
-            .then(adrTemplateDirectory => {
-              if (!adrTemplateDirectory) return;
-              console.log("adr.project.directory", adrProjectDirectory);
-              console.log("adr.templates.directory", adrTemplateDirectory);
-              console.log("adr.templates.repo", adrTemplateGitRepo);
-              vscode.workspace.getConfiguration().update("adr.project.directory", adrProjectDirectory, vscode.ConfigurationTarget.Workspace);
-              vscode.workspace.getConfiguration().update("adr.templates.directory", adrTemplateDirectory, vscode.ConfigurationTarget.Workspace);
-              vscode.workspace.getConfiguration().update("adr.templates.repo", adrTemplateGitRepo, vscode.ConfigurationTarget.Workspace);
-              let basedir = vscode.workspace.rootPath;
-              adrUtils.init(basedir, adrProjectDirectory, adrTemplateDirectory, adrTemplateGitRepo);
-              vscode.window.showInformationMessage("ADR Init");
-            });
-        });
-    });
-}
-
-function adrNew() {
-  let adrFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get("adr.project.directory"));
-  let adrTemplateFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get("adr.templates.directory"));
+  if (!adrProjectDirectory) return
+  let configuredTemplateRepo = vscode.workspace.getConfiguration().get('adr.templates.repo')
   vscode.window
     .showInputBox({
-      prompt: "Enter new ADR name",
-      placeHolder: "Choose database"
+      value: configuredTemplateRepo,
+      prompt: 'Enter your adr templates git repo url:',
+      placeHolder: 'https://yourGitRepoWithADRTemplates'
     })
-    .then(srcAdrName => {
-      if (!srcAdrName) return;
+    .then(adrTemplateGitRepo => {
+      if (!adrTemplateGitRepo) return
+      let configuredTemplateDirectory = path.normalize(vscode.workspace.getConfiguration().get('adr.templates.directory'))
       vscode.window
-        .showQuickPick(["None", "Supersedes", "Amends"], {
-          prompt: "Select if there is a relation with existing ADR"
+        .showInputBox({
+          value: configuredTemplateDirectory,
+          prompt: 'Enter your adr templates Directory path for this workspace:',
+          placeHolder: '.adr-templates'
         })
-        .then(linkType => {
-          if (!linkType) return;
-          if (!(linkType === "None")) {
-            vscode.window
-              .showQuickPick(adrUtils.getAllAdr(adrFolder), {
-                prompt: "Enter target ADR name",
-                placeHolder: "Choose database"
-              })
-              .then(tgtAdrName => {
-                if (!tgtAdrName) return;
-                let filepath = adrUtils.createNewAdr(srcAdrName, linkType, tgtAdrName, adrFolder, adrTemplateFolder);
-                vscode.workspace.openTextDocument(filepath).then(doc => vscode.window.showTextDocument(doc));
-              });
-          } else {
-            let filepath = adrUtils.createNewAdr(srcAdrName, null, null, adrFolder, adrTemplateFolder);
-            vscode.workspace.openTextDocument(filepath).then(doc => vscode.window.showTextDocument(doc));
-          }
-        });
-    });
+        .then(adrTemplateDirectory => {
+          if (!adrTemplateDirectory) return
+          console.log('adr.project.directory', adrProjectDirectory)
+          console.log('adr.templates.directory', adrTemplateDirectory)
+          console.log('adr.templates.repo', adrTemplateGitRepo)
+          vscode.workspace.getConfiguration().update('adr.project.directory', adrProjectDirectory, vscode.ConfigurationTarget.Workspace)
+          vscode.workspace.getConfiguration().update('adr.templates.directory', adrTemplateDirectory, vscode.ConfigurationTarget.Workspace)
+          vscode.workspace.getConfiguration().update('adr.templates.repo', adrTemplateGitRepo, vscode.ConfigurationTarget.Workspace)
+          let basedir = vscode.workspace.rootPath
+          adrUtils.init(basedir, adrProjectDirectory, adrTemplateDirectory, adrTemplateGitRepo)
+          vscode.window.showInformationMessage('ADR Init')
+        })
+    })
 }
 
-function adrLink() {
-  let adrFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get("adr.project.directory"));
+function adrNew () {
+  let adrAttr = {}
+  let adrFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get('adr.project.directory'))
+  let adrTemplateFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get('adr.templates.directory'))
+  vscode.window
+    .showInputBox({
+      prompt: 'Enter new ADR name',
+      placeHolder: 'Choose database'
+    })
+    .then(srcAdrName => {
+      if (!srcAdrName) return
+      vscode.window.showQuickPick(['Accepted', 'Proposal'], { placeHolder: 'Select status for this ADR' })
+        .then(status => {
+          if (!status) return
+          vscode.window
+            .showQuickPick(['None', 'Supersedes', 'Amends'], {
+              placeHolder: 'Select if there is a relation with an existing ADR'
+            })
+            .then(linkType => {
+              if (!linkType) return
+              if (!(linkType === 'None')) {
+                vscode.window
+                  .showQuickPick(adrUtils.getAllAdr(adrFolder), {
+                    prompt: 'Enter target ADR name',
+                    placeHolder: 'Enter target ADR name'
+                  })
+                  .then(tgtAdrName => {
+                    if (!tgtAdrName) return
+                    adrAttr.srcAdrName = srcAdrName
+                    adrAttr.linkType = linkType
+                    adrAttr.tgtAdrName = tgtAdrName
+                    adrAttr.status = status
+                    let filepath = adrUtils.createNewAdr(adrAttr, adrFolder, adrTemplateFolder)
+                    vscode.workspace.openTextDocument(filepath).then(doc => vscode.window.showTextDocument(doc))
+                  })
+              } else {
+                adrAttr.srcAdrName = srcAdrName
+                adrAttr.status = status
+                let filepath = adrUtils.createNewAdr(adrAttr, adrFolder, adrTemplateFolder)
+                vscode.workspace.openTextDocument(filepath).then(doc => vscode.window.showTextDocument(doc))
+              }
+            })
+        })
+    })
+}
+
+function adrChangeStatus () {
+  let adrFolder = path.join(vscode.workspace.rootPath,
+    vscode.workspace.getConfiguration().get('adr.project.directory'))
+  vscode.window.showQuickPick(adrUtils.getAllAdr(adrFolder), {
+    prompt: 'Enter target ADR name'
+  }).then(adrFile => {
+    if (!adrFile) return
+    vscode.window.showQuickPick(['Accepted', 'Proposal', 'Rejected'], {
+      prompt: 'Select new status'
+    }).then(newStatus => {
+      if (!newStatus) return
+      adrUtils.changeStatus(path.join(adrFolder, adrFile), newStatus)
+    })
+  })
+}
+
+function adrLink () {
+  let adrFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get('adr.project.directory'))
   vscode.window
     .showQuickPick(adrUtils.getAllAdr(adrFolder), {
-      prompt: "Enter source ADR name",
-      placeHolder: "Choose database"
+      prompt: 'Enter source ADR name',
+      placeHolder: 'Choose database'
     })
     .then(srcAdrName => {
-      if (!srcAdrName) return;
+      if (!srcAdrName) return
       vscode.window
-        .showQuickPick(["Supersedes", "Amends"], {
-          prompt: "Select if there is a relation with existing ADR"
+        .showQuickPick(['Supersedes', 'Amends'], {
+          prompt: 'Select if there is a relation with existing ADR'
         })
         .then(linkType => {
-          if (!linkType) return;
+          if (!linkType) return
           vscode.window
             .showQuickPick(adrUtils.getAllAdr(adrFolder), {
-              prompt: "Enter target ADR name",
-              placeHolder: "Choose database"
+              prompt: 'Enter target ADR name',
+              placeHolder: 'Choose database'
             })
             .then(tgtAdrName => {
-              if (!tgtAdrName) return;
-              adrUtils.addLink(tgtAdrName, adrFolder + path.sep + srcAdrName, linkType);
-              let linkedType = "";
-              if (linkType === "Supersedes") {
-                linkedType = "Superceded by";
+              if (!tgtAdrName) return
+              adrUtils.addLink(tgtAdrName, adrFolder + path.sep + srcAdrName, linkType)
+              let linkedType = ''
+              if (linkType === 'Supersedes') {
+                linkedType = 'Superceded by'
               } else {
-                linkedType = linkType.replace(/s$/, "ed by");
+                linkedType = linkType.replace(/s$/, 'ed by')
               }
-              adrUtils.addLink(srcAdrName, adrFolder + path.sep + tgtAdrName, linkedType);
-              vscode.window.showInformationMessage("ADR Link");
-            });
-        });
-    });
+              adrUtils.addLink(srcAdrName, adrFolder + path.sep + tgtAdrName, linkedType)
+              vscode.window.showInformationMessage('ADR Link')
+            })
+        })
+    })
 }
 
-module.exports.adrLink = adrLink;
-module.exports.adrNew = adrNew;
-module.exports.adrInit = adrInit;
+function getLinkDst (linkStr) {
+  // must match: Superseded by 0003-rechange_db.md
+  let dst = linkStr.match(/([\w-]*\.md)[ \t]*$/)
+  if (dst.length > 1) {
+    return dst[1]
+  }
+}
+
+function getLinkType (linkStr) {
+  let dst = linkStr.match(/^([\w\t -_]*) [\w-]*\.md[ \t]*$/)
+  if (dst.length > 1) {
+    return dst[1]
+  }
+}
+
+function adrGenerateDocs () {
+  console.log('entering generate docs')
+  let adrFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get('adr.project.directory'))
+  let adrs = adrUtils.getAllAdr(adrFolder)
+  graph.deleteGraph(adrFolder)
+  console.log('adrfolder: ' + adrFolder + ' - adrs: ' + adrs)
+  try {
+    adrs.forEach(adr => {
+      console.log('treating adr: ' + adr)
+
+      let adrTitle = parsing.getTitle(adrFolder, adr)
+      let sectionData = parsing.getStatusSection(adrFolder, adr)
+      let status = parsing.getStatus(sectionData)
+      let prevStatus = parsing.getPreviousStatus(sectionData)
+      let adrIndex = adr.split('-')[0]
+      console.log('adrTitle: ' + adrTitle)
+      console.log('statuses: ' + status)
+      console.log('adrIndex: ' + adrIndex)
+      graph.createNode(adrFolder, adrIndex, adr, adrTitle, status.date, status.status)
+      prevStatus.forEach(pStatus => {
+        graph.addStatus(adrFolder, adrIndex, pStatus.status, pStatus.date)
+      })
+      let links = parsing.getRelations(sectionData)
+      if (links !== undefined && links.length > 0) {
+        links.forEach(link => {
+          // let indexDst = getLinkDst(link)
+          // let linkType = getLinkType(link)
+          graph.addLink(adrFolder, adrIndex, link.adrFilename.split('-')[0], link.link, link.date)
+        })
+      }
+    })
+    graph.graphToFlowChart(adrFolder)
+  } catch (error) {
+    console.log(error)
+  }
+  // parse
+  // create graph
+  // generate flowchart
+}
+
+module.exports.adrLink = adrLink
+module.exports.adrNew = adrNew
+module.exports.adrInit = adrInit
+module.exports.adrChangeStatus = adrChangeStatus
+module.exports.adrGenerateDocs = adrGenerateDocs
