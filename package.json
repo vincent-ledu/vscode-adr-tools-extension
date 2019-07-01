@@ -2,7 +2,7 @@
 	"name": "adr-tools",
 	"displayName": "adr-tools",
 	"description": "Architecture Decision Records tool",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"publisher": "vincent-ledu",
 	"license": "MIT",
 	"repository": {
