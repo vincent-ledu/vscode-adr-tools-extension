@@ -3,5 +3,4 @@ node_modules
 .vscode/settings.json
 *.vsix
 coverage
-testworkspace/*
 testtemp/
