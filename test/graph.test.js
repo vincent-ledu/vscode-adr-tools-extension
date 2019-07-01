@@ -9,12 +9,8 @@ const clean = require('../clean')
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite('Graph report tests cases', function () {
-  let adrPath = vscode.workspace
-    .getConfiguration()
-    .get('adr.project.directory')
-  let adrTemplatePath = vscode.workspace
-    .getConfiguration()
-    .get('adr.templates.directory')
+  let adrPath = 'doc/adr'
+  let adrTemplatePath = '.adr-templates'
   let rootPath = path.join(vscode.workspace.rootPath, 'graph')
 
   test('should delete previous graph', function () {

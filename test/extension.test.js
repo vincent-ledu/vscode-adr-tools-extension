@@ -74,15 +74,8 @@ For a Visual Studio Code ADR toolset extention, see Vincent Le Dû's [vscode-adr
 `
 suite('Extension Tests', function () {
   let rootPath = path.join(vscode.workspace.rootPath, 'adrfunctions')
-  console.log('rootpath: ' + rootPath)
-  let adrPath = vscode.workspace
-    .getConfiguration()
-    .get('adr.project.directory')
-  console.log('adrPath: ' + adrPath)
-  let adrTemplatePath = vscode.workspace
-    .getConfiguration()
-    .get('adr.templates.directory')
-  console.log('adrtemplates: ' + adrTemplatePath)
+  let adrPath = 'doc/adr'
+  let adrTemplatePath = '.adr-templates'
 
 
   test('adr init', function () {
