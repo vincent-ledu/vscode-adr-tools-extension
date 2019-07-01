@@ -3,9 +3,9 @@ const assert = require('assert')
 
 const vscode = require('vscode')
 const path = require('path')
-// const myExtension = require('../extension');
 const adrUtils = require('../adrfunc/adr-utils')
 const graphreport = require('../reports/graph')
+const clean = require('../clean')
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite('Graph report tests cases', function () {
@@ -22,6 +22,7 @@ suite('Graph report tests cases', function () {
     if (typeof rootPath === 'undefined') {
       rootPath = './testworkspace/graph'
     }
+    clean.deleteFolderRecursive(path.join(rootPath, adrPath))
     adrUtils.init(rootPath, adrPath, adrTemplatePath, vscode.workspace.getConfiguration().get('adr.templates.repo'))
     let adr1 = adrUtils.createNewAdr({ srcAdrName: 'parsing adr test1', status: 'Accepted' },
       path.join(rootPath, adrPath),

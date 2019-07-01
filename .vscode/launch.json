@@ -22,7 +22,7 @@
 			"args": [
 				"${workspaceFolder}/testworkspace",
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/test"
+				"--extensionTestsPath=${workspaceFolder}/testworkspace"
 			]
 		}
 	]
