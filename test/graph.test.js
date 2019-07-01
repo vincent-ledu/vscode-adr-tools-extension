@@ -15,6 +15,7 @@ suite('Graph report tests cases', function () {
 
   test('should delete previous graph', function () {
     this.timeout = 10000
+    console.error('rootPath: ' + rootPath)
     if (typeof rootPath === 'undefined') {
       rootPath = './testworkspace/graph'
     }

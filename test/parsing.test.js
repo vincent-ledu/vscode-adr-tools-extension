@@ -14,6 +14,7 @@ suite('Extension Tests', function () {
 
   // Defines a Mocha unit test
   test('get status section', function () {
+    console.error('rootPath: ' + rootPath)
     this.timeout(10000)
     if (typeof rootPath === 'undefined') {
       rootPath = './testworkspace/parse'

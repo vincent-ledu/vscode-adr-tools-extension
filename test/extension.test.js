@@ -77,8 +77,8 @@ suite('Extension Tests', function () {
   let adrPath = 'doc/adr'
   let adrTemplatePath = '.adr-templates'
 
-
   test('adr init', function () {
+    console.error('rootPath: ' + rootPath)
     if (typeof rootPath === 'undefined') {
       rootPath = './testworkspace/adrfunctions'
     }
