@@ -144,22 +144,10 @@ function init (basedir, adrPath, adrTemplatePath, gitRepo) {
     utils.mkDirByPathSync(adrTemplatePath)
 
     const cp = require('child_process')
-    cp.execSync('git clone ' + gitRepo + ' ' + adrTemplatePath, function (err, stdout, stderr) {
-      if (err) {
-        console.log('error while cloning adr template: ' + err)
-      }
-      console.log(`stdout: ${stdout}`)
-      console.log(`stderr: ${stderr}`)
-    })
+    let result = cp.execSync('git clone ' + gitRepo + ' ' + adrTemplatePath, { stdio: 'inherit' })
+    console.log(result)
   } else {
-    const cp = require('child_process')
-    cp.execSync('git reset --hard origin/master', { cwd: adrTemplatePath }, function (err, stdout, stderr) {
-      if (err) {
-        console.log('error while updating adr template: ' + err)
-      }
-      console.log(`stdout: ${stdout}`)
-      console.log(`stderr: ${stderr}`)
-    })
+// TODO : find something to do...
   }
 
   var data = ''

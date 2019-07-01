@@ -1,23 +1,79 @@
 /* global suite, test */
-
-//
-// Note: This example test is leveraging the Mocha test framework.
-// Please refer to their documentation on https://mochajs.org/ for help.
-//
-
-// The module 'assert' provides assertion methods from node
 const assert = require('assert')
-
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
 const vscode = require('vscode')
 const fs = require('fs')
 const path = require('path')
-// const myExtension = require('../extension');
 const adrUtils = require('../adrfunc/adr-utils')
+const clean = require('../clean')
 
-// Defines a Mocha test suite to group tests of similar kind together
+const RecordArchitectureDecision = `# 0. Record architecture decisions
+
+Date: {{ date }}
+
+## Status
+
+Status: {{ status }}
+
+## Context
+
+We need to record the architectural decisions made on this project.
+
+## Decision
+
+We will use Architecture Decision Records, as [described by Michael Nygard](http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions).
+
+## Consequences
+
+See Michael Nygard's article, linked above. 
+For a lightweight ADR toolset, see Nat Pryce's [adr-tools](https://github.com/npryce/adr-tools).
+For a Visual Studio Code ADR toolset extention, see Vincent Le Dû's [vscode-adr-extention](https://github.com/vincent-ledu/adr-template)
+`
+const indexRecordnameMD = `# {{ adr-index}}. {{ adr-name }}
+
+Date: {{ date }}
+
+## Status
+
+Status: {{ status }}  
+{{ links }}
+
+## Context
+
+The issue motivating this decision, and any context that influences or constrains the decision.
+
+## Decision
+
+The change that we're proposing or have agreed to implement.
+
+## Consequences
+
+What becomes easier or more difficult to do and any risks introduced by the change that will need to be mitigated.
+`
+
+const adr0000 = `# 0. Record architecture decisions
+
+Date: Saturday, June 29, 2019
+
+## Status
+
+Status: Accepted on Saturday, June 29, 2019
+
+## Context
+
+We need to record the architectural decisions made on this project.
+
+## Decision
+
+We will use Architecture Decision Records, as [described by Michael Nygard](http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions).
+
+## Consequences
+
+See Michael Nygard's article, linked above. 
+For a lightweight ADR toolset, see Nat Pryce's [adr-tools](https://github.com/npryce/adr-tools).
+For a Visual Studio Code ADR toolset extention, see Vincent Le Dû's [vscode-adr-extention](https://github.com/vincent-ledu/adr-template)
+`
 suite('Extension Tests', function () {
+  let rootPath = path.join(vscode.workspace.rootPath, 'adrfunctions')
   let adrPath = vscode.workspace
     .getConfiguration()
     .get('adr.project.directory')
@@ -25,93 +81,97 @@ suite('Extension Tests', function () {
     .getConfiguration()
     .get('adr.templates.directory')
 
-  // Defines a Mocha unit test
   test('adr init', function () {
-    let rootPath = vscode.workspace.rootPath
     if (typeof rootPath === 'undefined') {
-      rootPath = './testworkspace'
+      rootPath = './testworkspace/adrfunctions'
     }
-    console.log('typeof vscode.workspace.rootPath:' + typeof (vscode.workspace.rootPath))
-    console.log('typeof adrPath:' + typeof (adrPath))
-    console.log('typeof adrTemplatePath:' + typeof (adrTemplatePath))
-    console.log('typeof vscode.workspace.getConfiguration().get("adr.templates.repo"):' + typeof (vscode.workspace.getConfiguration().get('adr.templates.repo')))
+    console.log('rootpath : ' + rootPath)
+    // clean.deleteFolderRecursive(rootPath)
     adrUtils.init(
       rootPath,
       adrPath,
       adrTemplatePath,
       vscode.workspace.getConfiguration().get('adr.templates.repo')
     )
-    assert.equal(
-      fs.accessSync(
-        path.join(rootPath, adrPath),
-        fs.constants.F_OK
-      ),
-      undefined
+    assert.strictEqual(
+      fs.readFileSync(
+        path.join(rootPath, adrTemplatePath, 'index-recordname.md'), 'utf8').replace(/\r/gm, ''),
+      indexRecordnameMD
     )
-    assert.equal(
-      fs.accessSync(
-        path.join(rootPath, adrTemplatePath),
-        fs.constants.F_OK
-      ),
-      undefined
+    assert.strictEqual(
+      fs.readFileSync(
+        path.join(rootPath, adrTemplatePath, '0000-record-architecture-decisions.md'), 'utf8').replace(/\r/gm, ''),
+      RecordArchitectureDecision
     )
-    assert.equal(
-      typeof adrUtils.getAllAdr(path.join(rootPath, adrPath)),
-      typeof ['']
+    assert.strictEqual(
+      fs.readFileSync(
+        path.join(rootPath, adrPath, '0000-record-architecture-decisions.md'), 'utf8').replace(/\r/gm, ''),
+      adr0000
     )
   })
 
   test('adr new', function () {
-    let rootPath = vscode.workspace.rootPath
     if (typeof rootPath === 'undefined') {
-      rootPath = './testworkspace'
+      rootPath = './testworkspace/adrfunctions'
     }
-    let adr1 = adrUtils.createNewAdr({ srcAdrName: 'mytest1adr', status: 'Accepted' },
+    let adr1 = adrUtils.createNewAdr({ srcAdrName: 'My Test ADR 1', status: 'Accepted' },
       path.join(rootPath, adrPath),
       path.join(rootPath, adrTemplatePath)
     )
     let adr2 = adrUtils.createNewAdr(
-      { srcAdrName: 'mytest2adr', status: 'Accepted', linkType: 'Supersedes', tgtAdrName: '0001-mytest1adr.md' },
+      { srcAdrName: 'My Test ADR 2', status: 'Accepted', linkType: 'Supersedes', tgtAdrName: '0001-my-test-adr-1.md' },
       path.join(rootPath, adrPath),
       path.join(rootPath, adrTemplatePath)
     )
-    let adr3 = adrUtils.createNewAdr( { srcAdrName: 'mytest3adr', status: 'Accepted', linkType: 'Amends', tgtAdrName: '0002-mytest2adr.md' },
+    let adr3 = adrUtils.createNewAdr({ srcAdrName: 'My Test ADR 3', status: 'Accepted', linkType: 'Amends', tgtAdrName: '0002-my-test-adr-2.md' },
       path.join(rootPath, adrPath),
       path.join(rootPath, adrTemplatePath)
     )
 
-    assert.equal(fs.existsSync(adr1), true)
-    assert.equal(fs.existsSync(adr2), true)
-    assert.equal(fs.existsSync(adr3), true)
+    assert.strictEqual(fs.existsSync(adr1), true)
+    assert.strictEqual(fs.existsSync(adr2), true)
+    assert.strictEqual(fs.existsSync(adr3), true)
+    let data = fs.readFileSync(adr1, 'utf8')
+    console.log(adr1)
+    console.log(data)
+    assert.strictEqual(data.includes('Status: Superseded on '), true)
+    assert.strictEqual(data.includes('Previous status: Accepted on '), true)
+    assert.strictEqual(data.includes('Superseded by [0002-my-test-adr-2.md](0002-my-test-adr-2.md) on '), true)
+    data = fs.readFileSync(adr2, 'utf8')
+    assert.strictEqual(data.includes('Status: Accepted on '), true)
+    assert.strictEqual(data.includes('Amended by [0003-my-test-adr-3.md](0003-my-test-adr-3.md) on '), true)
+    assert.strictEqual(data.includes('Supersedes [0001-my-test-adr-1.md](0001-my-test-adr-1.md) on '), true)
+    data = fs.readFileSync(adr3, 'utf8')
+    assert.strictEqual(data.includes('Status: Accepted on '), true)
+    assert.strictEqual(data.includes('Amends [0002-my-test-adr-2.md](0002-my-test-adr-2.md) on '), true)
   })
 
-  // test('adr link', function () {
-  //   let rootPath = vscode.workspace.rootPath
-  //   if (typeof rootPath === 'undefined') {
-  //     rootPath = './testworkspace'
-  //   }
-  //   let srcFilePath = adrUtils.createNewAdr(
-  //     'mytest4adr',
-  //     null,
-  //     null,
-  //     path.join(rootPath, adrPath),
-  //     path.join(rootPath, adrTemplatePath)
-  //   )
-  //   let tgtFilePath = adrUtils.createNewAdr(
-  //     'mytest4adr',
-  //     null,
-  //     null,
-  //     path.join(rootPath, adrPath),
-  //     path.join(rootPath, adrTemplatePath)
-  //   )
+  test('adr link', function () {
+    if (typeof rootPath === 'undefined') {
+      rootPath = './testworkspace/adrfunctions'
+    }
+    let srcFilePath = adrUtils.createNewAdr(
+      'mytest4adr',
+      null,
+      null,
+      path.join(rootPath, adrPath),
+      path.join(rootPath, adrTemplatePath)
+    )
+    let tgtFilePath = adrUtils.createNewAdr(
+      'mytest5adr',
+      null,
+      null,
+      path.join(rootPath, adrPath),
+      path.join(rootPath, adrTemplatePath)
+    )
 
-  //   adrUtils.addLink('0005-mytest4adr.md', srcFilePath, 'Amends')
-  //   adrUtils.addLink('0004-mytest5adr.md', tgtFilePath, 'Amended by')
-  //   assert.equal(fs.existsSync(srcFilePath), true)
-  //   assert.equal(fs.existsSync(tgtFilePath), true)
-  //   let data = fs.readFileSync(tgtFilePath)
-  //   assert.equal(data.includes('Amended by 0004-mytest4adr.md') >= 0, true)
-  //   data = fs.readFileSync(srcFilePath)
-  //   assert.equal(data.includes('Amends 0005-mytest4adr.md') >= 0, true)
-  // })
+    adrUtils.addLink('0005-mytest5adr.md', srcFilePath, 'Amends')
+    adrUtils.addLink('0004-mytest4adr.md', tgtFilePath, 'Amended by')
+    assert.strictEqual(fs.existsSync(srcFilePath), true)
+    assert.strictEqual(fs.existsSync(tgtFilePath), true)
+    let data = fs.readFileSync(tgtFilePath)
+    assert.strictEqual(data.includes('Amended by 0004-mytest4adr.md') >= 0, true)
+    data = fs.readFileSync(srcFilePath)
+    assert.strictEqual(data.includes('Amends 0005-mytest5adr.md') >= 0, true)
+  })
 })
