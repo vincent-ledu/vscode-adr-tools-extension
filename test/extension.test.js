@@ -49,14 +49,14 @@ The change that we're proposing or have agreed to implement.
 
 What becomes easier or more difficult to do and any risks introduced by the change that will need to be mitigated.
 `
-
+const d = new Date().toISOString().split('T')[0]
 const adr0000 = `# 0. Record architecture decisions
 
-Date: Saturday, June 29, 2019
+Date: ` + d + `
 
 ## Status
 
-Status: Accepted on Saturday, June 29, 2019
+Status: Accepted on ` + d + `
 
 ## Context
 
@@ -86,7 +86,7 @@ suite('Extension Tests', function () {
       rootPath = './testworkspace/adrfunctions'
     }
     console.log('rootpath : ' + rootPath)
-    // clean.deleteFolderRecursive(rootPath)
+    clean.deleteFolderRecursive(path.join(rootPath, adrPath))
     adrUtils.init(
       rootPath,
       adrPath,
@@ -132,8 +132,6 @@ suite('Extension Tests', function () {
     assert.strictEqual(fs.existsSync(adr2), true)
     assert.strictEqual(fs.existsSync(adr3), true)
     let data = fs.readFileSync(adr1, 'utf8')
-    console.log(adr1)
-    console.log(data)
     assert.strictEqual(data.includes('Status: Superseded on '), true)
     assert.strictEqual(data.includes('Previous status: Accepted on '), true)
     assert.strictEqual(data.includes('Superseded by [0002-my-test-adr-2.md](0002-my-test-adr-2.md) on '), true)
@@ -150,17 +148,11 @@ suite('Extension Tests', function () {
     if (typeof rootPath === 'undefined') {
       rootPath = './testworkspace/adrfunctions'
     }
-    let srcFilePath = adrUtils.createNewAdr(
-      'mytest4adr',
-      null,
-      null,
+    let srcFilePath = adrUtils.createNewAdr({ srcAdrName: 'My Test ADR 4', status: 'Accepted' },
       path.join(rootPath, adrPath),
       path.join(rootPath, adrTemplatePath)
     )
-    let tgtFilePath = adrUtils.createNewAdr(
-      'mytest5adr',
-      null,
-      null,
+    let tgtFilePath = adrUtils.createNewAdr({ srcAdrName: 'My Test ADR 5', status: 'Accepted' },
       path.join(rootPath, adrPath),
       path.join(rootPath, adrTemplatePath)
     )
@@ -170,8 +162,8 @@ suite('Extension Tests', function () {
     assert.strictEqual(fs.existsSync(srcFilePath), true)
     assert.strictEqual(fs.existsSync(tgtFilePath), true)
     let data = fs.readFileSync(tgtFilePath)
-    assert.strictEqual(data.includes('Amended by 0004-mytest4adr.md') >= 0, true)
+    assert.strictEqual(data.includes('Amended by [0004-mytest4adr.md](0004-mytest4adr.md) on '), true)
     data = fs.readFileSync(srcFilePath)
-    assert.strictEqual(data.includes('Amends 0005-mytest5adr.md') >= 0, true)
+    assert.strictEqual(data.includes('Amends [0005-mytest5adr.md](0005-mytest5adr.md) on '), true)
   })
 })

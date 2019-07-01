@@ -3,13 +3,6 @@ const path = require('path')
 
 const utils = require('../common/utils')
 
-let dateOptions = {
-  weekday: 'long',
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-}
-
 /**
  * Clean ADR name user input to make a filename
  * @param {String} adrName the ADR name typed by the user
@@ -64,17 +57,17 @@ function createNewAdr (adrAttr, adrPath, adrTemplatePath) {
   let lastIndex = getLastIndex(adrPath)
   lastIndex = '' + (lastIndex + 1)
   var data = ''
-  let d = new Date()
+  let d = new Date().toISOString().split('T')[0]
   data = {
-    date: d.toLocaleDateString('en-EN', dateOptions),
-    status: '' + adrAttr.status + ' on ' + d.toLocaleDateString('en-EN', dateOptions),
+    date: d,
+    status: '' + adrAttr.status + ' on ' + d,
     'adr-index': lastIndex,
     'adr-name': '' + adrAttr.srcAdrName + ''
   }
   srcAdrSanitizeName = lastIndex.padStart(4, '0') + '-' + sanitizedAdrName(adrAttr.srcAdrName) + '.md'
 
   if (adrAttr.linkType != null && adrAttr.tgtAdrName != null) {
-    data['links'] = adrAttr.linkType + ' [' + adrAttr.tgtAdrName + '](' + adrAttr.tgtAdrName + ') on ' + d.toLocaleDateString('en-EN', dateOptions)
+    data['links'] = adrAttr.linkType + ' [' + adrAttr.tgtAdrName + '](' + adrAttr.tgtAdrName + ') on ' + d
     let tgtFilePath = adrPath + path.sep + adrAttr.tgtAdrName
     let linkedType = adrAttr.linkType.replace(/s$/, 'ed by')
     if (adrAttr.linkType.trim().endsWith('es')) {
@@ -95,19 +88,15 @@ function createNewAdr (adrAttr, adrPath, adrTemplatePath) {
  * @param {String} status new status
  */
 function changeStatus (adrFilePath, status) {
-  fs.readFile(adrFilePath, 'utf8', function (err, data) {
-    if (err) {
-      return console.log(err)
-    }
-    let d = new Date()
-    var result = ''
-    result = data.replace(
-      /## Status([\s\S]+)Status: ([\w \t,]*)\s*/,
-      '## Status$1Status: ' + status + ' on ' + d.toLocaleDateString('en-EN', dateOptions) + '\nPrevious status: $2  \n'
-    )
-    fs.writeFileSync(adrFilePath, result, 'utf8', function (err) {
-      if (err) return console.log(err)
-    })
+  let data = fs.readFileSync(adrFilePath, 'utf8')
+  let d = new Date().toISOString().split('T')[0]
+  var result = ''
+  result = data.replace(
+    /^## Status([\s\S]+)^Status:([\w \t-]*)$/m,
+    '## Status$1Status: ' + status + ' on ' + d + '  \nPrevious status:$2\n'
+  )
+  fs.writeFileSync(adrFilePath, result, 'utf8', function (err) {
+    if (err) return console.log(err)
   })
 }
 
@@ -125,10 +114,10 @@ function addLink (srcAdrName, tgtFilePath, linkType) {
     changeStatus(tgtFilePath, 'Superseded')
   }
   let data = fs.readFileSync(tgtFilePath, 'utf8')
-  let d = new Date()
+  let d = new Date().toISOString().split('T')[0]
   let result = data.replace(
-    /## Status([\s\S]+)Status: ([\w ,\t]*)\s*/,
-    '## Status$1Status: $2  \n' + linkType + ' [' + srcAdrName + '](' + srcAdrName + ') on ' + d.toLocaleDateString('en-EN', dateOptions) + '\n'
+    /^## Status([\s\S]+)^Status:([\w \t-]*)$/m,
+    '## Status$1Status:$2\n' + linkType + ' [' + srcAdrName + '](' + srcAdrName + ') on ' + d + '  '
   )
   fs.writeFileSync(tgtFilePath, result, 'utf8')
 }
@@ -147,14 +136,14 @@ function init (basedir, adrPath, adrTemplatePath, gitRepo) {
     let result = cp.execSync('git clone ' + gitRepo + ' ' + adrTemplatePath, { stdio: 'inherit' })
     console.log(result)
   } else {
-// TODO : find something to do...
+    // TODO : find something to do...
   }
 
   var data = ''
-  let d = new Date()
+  let d = new Date().toISOString().split('T')[0]
   data = {
-    date: d.toLocaleDateString('en-EN', dateOptions),
-    status: 'Accepted on ' + d.toLocaleDateString('en-EN', dateOptions)
+    date: d,
+    status: 'Accepted on ' + d
   }
   let output = mustach.render(
     fs.readFileSync(adrTemplatePath + path.sep + '0000-record-architecture-decisions.md', 'utf8'),

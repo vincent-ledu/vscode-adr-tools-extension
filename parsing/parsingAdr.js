@@ -32,7 +32,7 @@ function getStatusSection (adrDir, file) {
  * @param {String} data content in the status section
  */
 function getStatus (data) {
-  let res = data.match(/^Status:[ \t]*([\w \t]+) on ([\w, ]+)$/m)
+  let res = data.match(/^Status:[ \t]*([\w \t]+) on ([\w -]+)$/m)
   if (res.length > 1) {
     return { 'status': res[1].trim(), 'date': Date.parse(res[2].trim()) }
   } else {
@@ -41,7 +41,7 @@ function getStatus (data) {
 }
 
 function getPreviousStatus (data) {
-  const regex = /^Previous status:[ \t]*([\w \t]+) on ([\w, ]+)$/mg
+  const regex = /^Previous status:[ \t]*([\w \t]+) on ([\w -]+)$/mg
   let res = []
   let m
   while ((m = regex.exec(data)) !== null) {
@@ -49,9 +49,6 @@ function getPreviousStatus (data) {
     if (m.index === regex.lastIndex) {
       regex.lastIndex++
     }
-    console.log('====== getPreviousStatus ======')
-    console.log('m: ' + m)
-    console.log('m length: ' + m.length)
     if (m.length === 3) {
       res.push({ 'status': m[1].trim(), 'date': Date.parse(m[2].trim()) })
     }
@@ -60,7 +57,7 @@ function getPreviousStatus (data) {
 }
 
 function getRelations (data) {
-  const regex = /^([\w \t-]+)\[([\d\w-]+\.md)\]\([\d\w-]+\.md\) on ([\w, ]+)$/gm
+  const regex = /^([\w \t-]+)\[([\d\w-]+\.md)\]\([\d\w-]+\.md\) on ([\w -]+)$/gm
   let res = []
   let m
   while ((m = regex.exec(data)) != null) {
@@ -68,9 +65,6 @@ function getRelations (data) {
     if (m.index === regex.lastIndex) {
       regex.lastIndex++
     }
-    console.log('====== getRelations ======')
-    console.log('m: ' + m)
-    console.log('m length: ' + m.length)
     if (m.length === 4) {
       res.push({ 'link': m[1].trim(), 'adrFilename': m[2].trim(), 'date': Date.parse(m[3].trim()) })
     }
