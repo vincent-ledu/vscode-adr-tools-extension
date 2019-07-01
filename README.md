@@ -29,7 +29,7 @@ This is a pre-release, for first users feedback.
 
 ## Release Notes
 
-## [0.0.3]
+### 0.0.3
 
 New features:
 * new status: 'Proposal'
