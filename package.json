@@ -72,8 +72,7 @@
 	},
 	"scripts": {
 		"postinstall": "node ./node_modules/vscode/bin/install",
-		"test": "cross-env CODE_TESTS_WORKSPACE=/Users/travis/build/vincent-ledu/vscode-adr-tools-extension/testworkspace node ./node_modules/vscode/bin/test",
-		"clean": "node clean.js"
+		"test": "cross-env CODE_TESTS_WORKSPACE=/Users/travis/build/vincent-ledu/vscode-adr-tools-extension/testworkspace node ./node_modules/vscode/bin/test"
 	},
 	"devDependencies": {
 		"@types/mocha": "^2.2.42",
