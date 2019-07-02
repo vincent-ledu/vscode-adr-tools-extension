@@ -73,56 +73,50 @@ For a lightweight ADR toolset, see Nat Pryce's [adr-tools](https://github.com/np
 For a Visual Studio Code ADR toolset extention, see Vincent Le Dû's [vscode-adr-extention](https://github.com/vincent-ledu/adr-template)
 `
 suite('Extension Tests', function () {
-  let rootPath = path.join(vscode.workspace.rootPath, 'adrfunctions')
-  let adrPath = 'doc/adr'
-  let adrTemplatePath = '.adr-templates'
+  let rootPath = path.join(process.env.TEMP, 'testworkspace', 'adrfunctions')
+  let adrPath = path.join(rootPath, 'doc/adr')
+  let adrTemplatePath = path.join(rootPath, '.adr-templates')
+
+  this.beforeAll(function () {
+    clean.deleteFolderRecursive(adrPath)
+  })
 
   test('adr init', function () {
-    console.error('rootPath: ' + rootPath)
-    if (typeof rootPath === 'undefined') {
-      rootPath = './testworkspace/adrfunctions'
-    }
-    console.log('rootpath : ' + rootPath)
-    clean.deleteFolderRecursive(path.join(rootPath, adrPath))
     adrUtils.init(
-      rootPath,
       adrPath,
       adrTemplatePath,
       vscode.workspace.getConfiguration().get('adr.templates.repo')
     )
     assert.strictEqual(
       fs.readFileSync(
-        path.join(rootPath, adrTemplatePath, 'index-recordname.md'), 'utf8').replace(/\r/gm, ''),
+        path.join(adrTemplatePath, 'index-recordname.md'), 'utf8').replace(/\r/gm, ''),
       indexRecordnameMD
     )
     assert.strictEqual(
       fs.readFileSync(
-        path.join(rootPath, adrTemplatePath, '0000-record-architecture-decisions.md'), 'utf8').replace(/\r/gm, ''),
+        path.join(adrTemplatePath, '0000-record-architecture-decisions.md'), 'utf8').replace(/\r/gm, ''),
       RecordArchitectureDecision
     )
     assert.strictEqual(
       fs.readFileSync(
-        path.join(rootPath, adrPath, '0000-record-architecture-decisions.md'), 'utf8').replace(/\r/gm, ''),
+        path.join(adrPath, '0000-record-architecture-decisions.md'), 'utf8').replace(/\r/gm, ''),
       adr0000
     )
   })
 
   test('adr new', function () {
-    if (typeof rootPath === 'undefined') {
-      rootPath = './testworkspace/adrfunctions'
-    }
     let adr1 = adrUtils.createNewAdr({ srcAdrName: 'My Test ADR 1', status: 'Accepted' },
-      path.join(rootPath, adrPath),
-      path.join(rootPath, adrTemplatePath)
+      adrPath,
+      adrTemplatePath
     )
     let adr2 = adrUtils.createNewAdr(
       { srcAdrName: 'My Test ADR 2', status: 'Accepted', linkType: 'Supersedes', tgtAdrName: '0001-my-test-adr-1.md' },
-      path.join(rootPath, adrPath),
-      path.join(rootPath, adrTemplatePath)
+      adrPath,
+      adrTemplatePath
     )
     let adr3 = adrUtils.createNewAdr({ srcAdrName: 'My Test ADR 3', status: 'Accepted', linkType: 'Amends', tgtAdrName: '0002-my-test-adr-2.md' },
-      path.join(rootPath, adrPath),
-      path.join(rootPath, adrTemplatePath)
+      adrPath,
+      adrTemplatePath
     )
 
     assert.strictEqual(fs.existsSync(adr1), true)
@@ -146,12 +140,12 @@ suite('Extension Tests', function () {
       rootPath = './testworkspace/adrfunctions'
     }
     let srcFilePath = adrUtils.createNewAdr({ srcAdrName: 'My Test ADR 4', status: 'Accepted' },
-      path.join(rootPath, adrPath),
-      path.join(rootPath, adrTemplatePath)
+      adrPath,
+      adrTemplatePath
     )
     let tgtFilePath = adrUtils.createNewAdr({ srcAdrName: 'My Test ADR 5', status: 'Accepted' },
-      path.join(rootPath, adrPath),
-      path.join(rootPath, adrTemplatePath)
+      adrPath,
+      adrTemplatePath
     )
 
     adrUtils.addLink('0005-mytest5adr.md', srcFilePath, 'Amends')

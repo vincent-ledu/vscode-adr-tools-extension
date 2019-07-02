@@ -31,7 +31,7 @@ fi
 
 if [ "$FOUND_README" = "0" ] && [ "$FOUND_CHANGELOG" = "0" ] ; then
     echo "go push new version on github"
-    git tag -a $NEW_VERSION -m "releasing version $NEW_VERSION" git push origin --tags
+    git tag -a $NEW_VERSION -m "releasing version $NEW_VERSION" && git push origin --tags
 else
     exit 1
 fi

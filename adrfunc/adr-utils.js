@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const mustache = require('mustache')
 
 const utils = require('../common/utils')
 
@@ -49,7 +50,6 @@ function getLastIndex (adrPath) {
  * @param {String} adrTemplatePath Folder where are stored ADR templates
  */
 function createNewAdr (adrAttr, adrPath, adrTemplatePath) {
-  const mustache = require('mustache')
   console.log(
     'create new adr ' + adrAttr.srcAdrName + ' in ' + adrPath + ' from templatepath ' + adrTemplatePath
   )
@@ -122,10 +122,7 @@ function addLink (srcAdrName, tgtFilePath, linkType) {
   fs.writeFileSync(tgtFilePath, result, 'utf8')
 }
 
-function init (basedir, adrPath, adrTemplatePath, gitRepo) {
-  const mustach = require('mustache')
-  adrPath = path.join(basedir, adrPath)
-  adrTemplatePath = path.join(basedir, adrTemplatePath)
+function init (adrPath, adrTemplatePath, gitRepo) {
   if (!fs.existsSync(adrPath)) {
     utils.mkDirByPathSync(adrPath)
   }
@@ -145,7 +142,7 @@ function init (basedir, adrPath, adrTemplatePath, gitRepo) {
     date: d,
     status: 'Accepted on ' + d
   }
-  let output = mustach.render(
+  let output = mustache.render(
     fs.readFileSync(adrTemplatePath + path.sep + '0000-record-architecture-decisions.md', 'utf8'),
     data)
   fs.writeFileSync(adrPath + path.sep + '0000-record-architecture-decisions.md', output)

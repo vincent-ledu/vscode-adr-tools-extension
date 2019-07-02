@@ -38,7 +38,9 @@ async function adrInit () {
           vscode.workspace.getConfiguration().update('adr.templates.directory', adrTemplateDirectory, vscode.ConfigurationTarget.Workspace)
           vscode.workspace.getConfiguration().update('adr.templates.repo', adrTemplateGitRepo, vscode.ConfigurationTarget.Workspace)
           let basedir = vscode.workspace.rootPath
-          adrUtils.init(basedir, adrProjectDirectory, adrTemplateDirectory, adrTemplateGitRepo)
+          adrUtils.init(path.join(basedir, adrProjectDirectory),
+            path.join(basedir, adrTemplateDirectory),
+            adrTemplateGitRepo)
           vscode.window.showInformationMessage('ADR Init')
         })
     })
