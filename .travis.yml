@@ -31,7 +31,8 @@ script:
 
 env:
   global:
-    - TEMP=/home/travis/testworkspace
+    - TEMP=/home/travis/build/vincent-ledu/vscode-adr-tools-extension/testworkspace/
+    - CODE_TESTS_WORKSPACE=/home/travis/build/vincent-ledu/vscode-adr-tools-extension/testworkspace/
     - secure: Nar/eohtQ1hW+/O9GpadGTAtAW6k3mwf5c22I0ysknTybUSeRL8MBrCCl8VyXB5JnzbhKZFGK1dcavet8d2CG3AxcsrEbiusCQitJ/P9XWCNobcioqlhglOmWI7d5E1eBRh4Vq0bNSgjuEiVjlm9j7kxxCyijLRY4JgcnxeotlD/ZgiIhKivMRTGPzrtnbK/4XY6u3Y115V3UiyGp1CoSxJpQ6A/K6cgxF9akaSjWO8BxUXZb7xJrLumVXIommNNovbQvZZwK+svp0IFUhifK2S3IsQf/2CUMaIbdVrMZT2loqe3G82tUuIwPw8pV9V8IUhghQBoc6OE3GqZpsLw7wNY33eRNPHysoH8vtESIpEKCawzDkxvRzYm3Kj410Gog4qIcjMgH60o7prstAQbsP+3SPwmEIoGAdCaoedbZEFCnOYkHpPasFEY9CB6GATFnjawSKsNMZMTqDNcYzXYQlM392chFqfjfIAmUGjF/I4v+H/r4usdk6VIbmctRE1BiSsS06wbbmIZuZMFNEsVyDGY4PMBurjtEsr2T0SVJN86CFDE0JUX+L3R+gndJeoyHXHPn1ssyrIgTC4k0/9lYVMOt2/ascI4Jr52waBv4P9ubhvaclyKWtZPE17LPa2aHPjox9T6pZLgdToPbMObUa+ol0AJ3AoI4UsW8JSo1gY=
 
 before_deploy:
