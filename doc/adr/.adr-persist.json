@@ -1,0 +1,35 @@
+{
+  "nodes": [
+    {
+      "index": "0000",
+      "filename": "0000-record-architecture-decisions.md",
+      "title": "Record architecture decisions",
+      "statuses": [{ "date": "1562025600000", "status": "Accepted" }]
+    },
+    { "index": "0001", "filename": "0001-choose-ide-target.md", "title": "Choose ide target", "statuses": [{ "date": "1558396800000", "status": "Accepted" }] },
+    {
+      "index": "0002",
+      "filename": "0002-choose-what-to-implement.md",
+      "title": "choose what to implement",
+      "statuses": [{ "date": "1558396800000", "status": "Accepted" }]
+    },
+    {
+      "index": "0003",
+      "filename": "0003-choose-templates-repository.md",
+      "title": "choose templates repository",
+      "statuses": [{ "date": "1558396800000", "status": "Accepted" }]
+    },
+    {
+      "index": "0004",
+      "filename": "0004-choose-graph-renderer.md",
+      "title": "Choose graph renderer",
+      "statuses": [{ "date": "1558396800000", "status": "Accepted" }]
+    }
+  ],
+  "links": [
+    { "src": "0002", "dst": "0004", "link": "Amended by", "createdDate": "1558396800000" },
+    { "src": "0002", "dst": "0003", "link": "Amended by", "createdDate": "1558396800000" },
+    { "src": "0003", "dst": "0002", "link": "Amends", "createdDate": "1558396800000" },
+    { "src": "0004", "dst": "0002", "link": "Amends", "createdDate": "1558396800000" }
+  ]
+}
