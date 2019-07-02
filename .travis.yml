@@ -26,8 +26,8 @@ install:
 # before_script:
 #   - npm run clean
 script:
-  - echo 'skiiping test'
-#  - npm test
+#  - echo 'skiiping test'
+  - npm test
 
 env:
   global:
