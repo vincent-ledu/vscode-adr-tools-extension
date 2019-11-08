@@ -70,7 +70,7 @@ suite('Graph report tests cases', function () {
     }
     let actual = graphreport.addStatus(adrPath, '0001', 'new status', new Date('2019-06-03'))
     assert.deepStrictEqual(actual, expected)
-    assert.deepStrictEqual(graphreport.addStatus(adrPath, '0002', 'new status', new Date('2019-06-03'), undefined))
+    assert.deepStrictEqual(graphreport.addStatus(adrPath, '0002', 'new status', new Date('2019-06-03')), undefined)
   })
 
   test('should add link between 2 adr', function () {
