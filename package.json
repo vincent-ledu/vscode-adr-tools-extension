@@ -30,17 +30,17 @@
 				"properties": {
 					"adr.templates.repo": {
 						"type": "string",
-						"description": "Git repo for downloading ADR templates",
+						"description": "url from where templates are cloned",
 						"default": "https://github.com/vincent-ledu/adr-template.git"
 					},
 					"adr.templates.directory": {
 						"type": "string",
-						"description": "Git repo for downloading ADR templates",
+						"description": "Source folder where template are git cloned",
 						"default": "./.adr-templates"
 					},
 					"adr.project.directory": {
 						"type": "string",
-						"description": "Folder to store ADR for a project",
+						"description": "Destination folder for ADR",
 						"default": "./doc/adr"
 					}
 				}
