@@ -1,4 +1,5 @@
-var fs = require('fs')
+const fs = require('fs')
+const logger = require('./common/logger')
 
 function deleteFolderRecursive (path) {
   if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
@@ -12,7 +13,7 @@ function deleteFolderRecursive (path) {
       }
     })
 
-    console.log(`Deleting directory "${path}"...`)
+    logger.vsLog(`Deleting directory "${path}"...`)
     fs.rmdirSync(path)
   }
 };

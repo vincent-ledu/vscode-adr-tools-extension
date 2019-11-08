@@ -3,6 +3,7 @@ const path = require('path')
 const mustache = require('mustache')
 
 const utils = require('../common/utils')
+const logger = require('../common/logger')
 
 /**
  * Clean ADR name user input to make a filename
@@ -50,7 +51,7 @@ function getLastIndex (adrPath) {
  * @param {String} adrTemplatePath Folder where are stored ADR templates
  */
 function createNewAdr (adrAttr, adrPath, adrTemplatePath) {
-  console.log(
+  logger.vsLog(
     'create new adr ' + adrAttr.srcAdrName + ' in ' + adrPath + ' from templatepath ' + adrTemplatePath
   )
   let srcAdrSanitizeName = ''
@@ -96,7 +97,7 @@ function changeStatus (adrFilePath, status) {
     '## Status$1Status: ' + status + ' on ' + d + '  \nPrevious status:$2\n'
   )
   fs.writeFileSync(adrFilePath, result, 'utf8', function (err) {
-    if (err) return console.log(err)
+    if (err) return logger.vsLog(err)
   })
 }
 
@@ -109,7 +110,7 @@ function changeStatus (adrFilePath, status) {
  * @param {String} linkType link type for linking the 2 ADR
  */
 function addLink (srcAdrName, tgtFilePath, linkType) {
-  console.log('add link ' + linkType + ' ' + srcAdrName + ' to ' + tgtFilePath)
+  logger.vsLog('add link ' + linkType + ' ' + srcAdrName + ' to ' + tgtFilePath)
   if (linkType === 'Superseded by') {
     changeStatus(tgtFilePath, 'Superseded')
   }
@@ -131,7 +132,7 @@ function init (adrPath, adrTemplatePath, gitRepo) {
 
     const cp = require('child_process')
     let result = cp.execSync('git clone ' + gitRepo + ' ' + adrTemplatePath, { stdio: 'inherit' })
-    console.log(result)
+    logger.vsLog(result)
   } else {
     // TODO : find something to do...
   }

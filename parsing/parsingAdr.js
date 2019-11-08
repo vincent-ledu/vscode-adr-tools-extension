@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const logger = require('../common/logger')
 
 /**
  * Look in the first line of text of the file, beginning with '# digit. Title'
@@ -36,7 +37,7 @@ function getStatus (data) {
   if (res.length > 1) {
     return { 'status': res[1].trim(), 'date': Date.parse(res[2].trim()) }
   } else {
-    console.log('error, no status found')
+    logger.vsLog('error, no status found')
   }
 }
 

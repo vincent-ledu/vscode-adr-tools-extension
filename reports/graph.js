@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-
+const logger = require('../common/logger')
 const graphFile = '.adr-persist.json'
 
 const flowChartFileName = 'flowChart.md'
@@ -40,7 +40,7 @@ function addStatus (adrDir, index, status, date) {
     return element.index === index
   })
   if (node === undefined) {
-    console.log('node not found: ' + index)
+    logger.vsLog('node not found: ' + index)
     // TODO: handle error
     return undefined
   }
@@ -53,10 +53,10 @@ function writeGraph (adrDir, graph) {
   try {
     fs.writeFileSync(path.join(adrDir, graphFile), JSON.stringify(graph), 'utf8')
   } catch (err) {
-    console.log('An error occured while writing graph Object to File.')
-    return console.log(err)
+    logger.vsLog('An error occured while writing graph Object to File.')
+    return logger.vsLog(err)
   }
-  console.log('Graph file has been saved.')
+  logger.vsLog('Graph file has been saved.')
 }
 
 function getGraph (adrDir) {
@@ -89,7 +89,8 @@ function deleteGraph (adrDir) {
     fs.unlinkSync(path.join(adrDir, graphFile))
   } catch (err) {
     if (err.code === 'ENOENT') {
-      return console.log('While trying to delete file ' + path.join(adrDir, graphFile) + ', the file was not found')
+      logger.vsLog('While trying to delete file ' + path.join(adrDir, graphFile) + ', the file was not found')
+      return
     }
     throw err
   }
@@ -97,9 +98,9 @@ function deleteGraph (adrDir) {
 
 function graphToFlowChart (adrDir) {
   let g = getGraph(adrDir)
-  console.log('g: ' + g)
-  console.log('g.nodes.length: ' + g.nodes.length)
-  console.log('g.links.length: ' + g.links.length)
+  logger.vsLog('g: ' + g)
+  logger.vsLog('g.nodes.length: ' + g.nodes.length)
+  logger.vsLog('g.links.length: ' + g.links.length)
   let output = ''
   output += '```mermaid\n'
   output += 'graph LR\n'

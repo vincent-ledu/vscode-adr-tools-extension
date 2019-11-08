@@ -3,6 +3,7 @@ const adrUtils = require('../adrfunc/adr-utils')
 const path = require('path')
 const parsing = require('../parsing/parsingAdr')
 const graph = require('../reports/graph')
+const logger = require('../common/logger')
 
 async function adrInit () {
   let configuredAdrProjectDirectory = path.normalize(vscode.workspace.getConfiguration().get('adr.project.directory'))
@@ -31,9 +32,9 @@ async function adrInit () {
         })
         .then(adrTemplateDirectory => {
           if (!adrTemplateDirectory) return
-          console.log('adr.project.directory', adrProjectDirectory)
-          console.log('adr.templates.directory', adrTemplateDirectory)
-          console.log('adr.templates.repo', adrTemplateGitRepo)
+          logger.vsLog('adr.project.directory: ' + adrProjectDirectory)
+          logger.vsLog('adr.templates.directory' + adrTemplateDirectory)
+          logger.vsLog('adr.templates.repo' + adrTemplateGitRepo)
           vscode.workspace.getConfiguration().update('adr.project.directory', adrProjectDirectory, vscode.ConfigurationTarget.Workspace)
           vscode.workspace.getConfiguration().update('adr.templates.directory', adrTemplateDirectory, vscode.ConfigurationTarget.Workspace)
           vscode.workspace.getConfiguration().update('adr.templates.repo', adrTemplateGitRepo, vscode.ConfigurationTarget.Workspace)
@@ -160,23 +161,23 @@ function getLinkType (linkStr) {
 }
 
 function adrGenerateDocs () {
-  console.log('entering generate docs')
+  logger.vsLog('entering generate docs')
   let adrFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get('adr.project.directory'))
   let adrs = adrUtils.getAllAdr(adrFolder)
   graph.deleteGraph(adrFolder)
-  console.log('adrfolder: ' + adrFolder + ' - adrs: ' + adrs)
+  logger.vsLog('adrfolder: ' + adrFolder + ' - adrs: ' + adrs)
   try {
     adrs.forEach(adr => {
-      console.log('treating adr: ' + adr)
+      logger.vsLog('treating adr: ' + adr)
 
       let adrTitle = parsing.getTitle(adrFolder, adr)
       let sectionData = parsing.getStatusSection(adrFolder, adr)
       let status = parsing.getStatus(sectionData)
       let prevStatus = parsing.getPreviousStatus(sectionData)
       let adrIndex = adr.split('-')[0]
-      console.log('adrTitle: ' + adrTitle)
-      console.log('statuses: ' + status)
-      console.log('adrIndex: ' + adrIndex)
+      logger.vsLog('adrTitle: ' + adrTitle)
+      logger.vsLog('statuses: ' + status)
+      logger.vsLog('adrIndex: ' + adrIndex)
       graph.createNode(adrFolder, adrIndex, adr, adrTitle, status.date, status.status)
       prevStatus.forEach(pStatus => {
         graph.addStatus(adrFolder, adrIndex, pStatus.status, pStatus.date)
@@ -192,7 +193,7 @@ function adrGenerateDocs () {
     })
     graph.graphToFlowChart(adrFolder)
   } catch (error) {
-    console.log(error)
+    logger.vsLog(error)
   }
   // parse
   // create graph
