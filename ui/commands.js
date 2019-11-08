@@ -57,15 +57,18 @@ function adrNew () {
       placeHolder: 'Choose database'
     })
     .then(srcAdrName => {
+      logger.vsLog('srcAdrName: ' + srcAdrName)
       if (!srcAdrName) return
       vscode.window.showQuickPick(['Accepted', 'Proposal'], { placeHolder: 'Select status for this ADR' })
         .then(status => {
+          logger.vsLog('status: ' + status)
           if (!status) return
           vscode.window
             .showQuickPick(['None', 'Supersedes', 'Amends'], {
               placeHolder: 'Select if there is a relation with an existing ADR'
             })
             .then(linkType => {
+              logger.vsLog('linkType: ' + linkType)
               if (!linkType) return
               if (!(linkType === 'None')) {
                 vscode.window

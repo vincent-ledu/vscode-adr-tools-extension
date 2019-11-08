@@ -42,6 +42,11 @@
 						"type": "string",
 						"description": "Destination folder for ADR",
 						"default": "./doc/adr"
+					},
+					"adr.log.enable": {
+						"type": "boolean",
+						"description": "true to activate logging",
+						"default": false
 					}
 				}
 			}

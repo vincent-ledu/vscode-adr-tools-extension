@@ -3,10 +3,12 @@ const vscode = require('vscode')
 const outputChannelName = 'META'
 
 const outputChannel = vscode.window.createOutputChannel(outputChannelName)
-outputChannel.show(false)
 
 function vsLog (msg) {
-  outputChannel.appendLine('ADR-VSCode: ' + msg)
+  if (vscode.workspace.getConfiguration().get('adr.log.enable')) {
+    outputChannel.show(false)
+    outputChannel.appendLine('ADR-VSCode: ' + msg)
+  }
 }
 
 module.exports.vsLog = vsLog

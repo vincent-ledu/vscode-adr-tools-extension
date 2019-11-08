@@ -29,6 +29,12 @@ This is a pre-release, for first users feedback.
 
 ## Release Notes
 
+### 0.0.4
+
+Adding logs and parameters to activate it:
+* Logs will appear in Output windows of vscode.
+* Parameter: adr.log.enable, to set in .
+
 ### 0.0.3
 
 New features:
