@@ -50,19 +50,18 @@ function getLastIndex (adrPath) {
  * @param {String} adrPath Folder where to store ADR
  * @param {String} adrTemplatePath Folder where are stored ADR templates
  */
-function createNewAdr (adrAttr, adrPath, adrTemplatePath) {
-  const useTimstampForFilePrefix = vscode.workspace.getConfiguration().get('adr.naming.timestamp');
-
+function createNewAdr (adrAttr, adrPath, adrTemplatePath, useTimestampPrefix) {
   logger.vsLog(
-    `create new adr ${adrAttr.srcAdrName}  in  ${adrPath} from templatepath  ${adrTemplatePath} useTimstampForFilePrefix: ${useTimstampForFilePrefix} `
+    `create new adr ${adrAttr.srcAdrName}  in  ${adrPath} from templatepath  ${adrTemplatePath} useTimstampForFilePrefix: ${useTimestampPrefix} `
   )
-  const srcAdrSanitizeName = getFileName(useTimstampForFilePrefix);
-  
+  const prefix = getPrefix(adrPath, useTimestampPrefix)
+  const srcAdrSanitizeName = `${prefix}-${sanitizedAdrName(adrAttr.srcAdrName)}.md`
+
   let currentIsoDateString = new Date().toISOString().split('T')[0]
   const data = {
     date: currentIsoDateString,
     status: '' + adrAttr.status + ' on ' + currentIsoDateString,
-    'adr-index': lastIndex,
+    'adr-index': prefix,
     'adr-name': '' + adrAttr.srcAdrName + ''
   }
 
@@ -78,32 +77,31 @@ function createNewAdr (adrAttr, adrPath, adrTemplatePath) {
   let templateContent = fs.readFileSync(adrTemplatePath + path.sep + 'index-recordname.md', 'utf8')
 
   let output = mustache.render(templateContent, data)
-  fs.writeFileSync(adrPath + path.sep + srcAdrSanitizeName, output)
-  return adrPath + path.sep + srcAdrSanitizeName
+  const newFilePath = path.join(adrPath, path.sep, srcAdrSanitizeName)
+  fs.writeFileSync(newFilePath, output)
+  return newFilePath
 }
 
 /**
  * Get the correct prefixed file name based on the timestamp flag parameter
  * @param {String} useTimstampForFilePrefix if true, then time will be used instead of index for the adr file
  */
-function getFileName(useTimstampForFilePrefix) {
-  let prefix = '';
-  if(useTimstampForFilePrefix) {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth()+1;
-    const day = currentDate.getDate();
-    const hour = currentDate.getHours();
-    const minute = currentDate.getMinutes();
-    prefix = `${year}${month}${day}-${hour}${minute}`;
+function getPrefix (adrPath, useTimstampForFilePrefix) {
+  let prefix = ''
+  if (useTimstampForFilePrefix) {
+    const currentDate = new Date()
+    const year = currentDate.getFullYear()
+    const month = currentDate.getMonth() + 1
+    const day = currentDate.getDate()
+    const hour = currentDate.getHours()
+    const minute = currentDate.getMinutes()
+    prefix = `${year}${month}${day}-${hour}${minute}`
   } else {
     let lastIndex = getLastIndex(adrPath)
     lastIndex = '' + (lastIndex + 1)
-    prefix = lastIndex.padStart(4, '0');
+    prefix = lastIndex.padStart(4, '0')
   }
- 
-  srcAdrSanitizeName = `${prefix}-${sanitizedAdrName(adrAttr.srcAdrName)}.md`;
-  return srcAdrSanitizeName;
+  return prefix
 }
 /**
  * change status of an adr
