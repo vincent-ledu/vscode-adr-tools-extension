@@ -51,24 +51,23 @@ function getLastIndex (adrPath) {
  * @param {String} adrTemplatePath Folder where are stored ADR templates
  */
 function createNewAdr (adrAttr, adrPath, adrTemplatePath) {
+  const useTimstampForFilePrefix = vscode.workspace.getConfiguration().get('adr.naming.timestamp');
+
   logger.vsLog(
-    'create new adr ' + adrAttr.srcAdrName + ' in ' + adrPath + ' from templatepath ' + adrTemplatePath
+    `create new adr ${adrAttr.srcAdrName}  in  ${adrPath} from templatepath  ${adrTemplatePath} useTimstampForFilePrefix: ${useTimstampForFilePrefix} `
   )
-  let srcAdrSanitizeName = ''
-  let lastIndex = getLastIndex(adrPath)
-  lastIndex = '' + (lastIndex + 1)
-  var data = ''
-  let d = new Date().toISOString().split('T')[0]
-  data = {
-    date: d,
-    status: '' + adrAttr.status + ' on ' + d,
+  const srcAdrSanitizeName = getFileName(useTimstampForFilePrefix);
+  
+  let currentIsoDateString = new Date().toISOString().split('T')[0]
+  const data = {
+    date: currentIsoDateString,
+    status: '' + adrAttr.status + ' on ' + currentIsoDateString,
     'adr-index': lastIndex,
     'adr-name': '' + adrAttr.srcAdrName + ''
   }
-  srcAdrSanitizeName = lastIndex.padStart(4, '0') + '-' + sanitizedAdrName(adrAttr.srcAdrName) + '.md'
 
   if (adrAttr.linkType != null && adrAttr.tgtAdrName != null) {
-    data['links'] = adrAttr.linkType + ' [' + adrAttr.tgtAdrName + '](' + adrAttr.tgtAdrName + ') on ' + d
+    data['links'] = adrAttr.linkType + ' [' + adrAttr.tgtAdrName + '](' + adrAttr.tgtAdrName + ') on ' + currentIsoDateString
     let tgtFilePath = adrPath + path.sep + adrAttr.tgtAdrName
     let linkedType = adrAttr.linkType.replace(/s$/, 'ed by')
     if (adrAttr.linkType.trim().endsWith('es')) {
@@ -83,6 +82,29 @@ function createNewAdr (adrAttr, adrPath, adrTemplatePath) {
   return adrPath + path.sep + srcAdrSanitizeName
 }
 
+/**
+ * Get the correct prefixed file name based on the timestamp flag parameter
+ * @param {String} useTimstampForFilePrefix if true, then time will be used instead of index for the adr file
+ */
+function getFileName(useTimstampForFilePrefix) {
+  let prefix = '';
+  if(useTimstampForFilePrefix) {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth()+1;
+    const day = currentDate.getDate();
+    const hour = currentDate.getHours();
+    const minute = currentDate.getMinutes();
+    prefix = `${year}${month}${day}-${hour}${minute}`;
+  } else {
+    let lastIndex = getLastIndex(adrPath)
+    lastIndex = '' + (lastIndex + 1)
+    prefix = lastIndex.padStart(4, '0');
+  }
+ 
+  srcAdrSanitizeName = `${prefix}-${sanitizedAdrName(adrAttr.srcAdrName)}.md`;
+  return srcAdrSanitizeName;
+}
 /**
  * change status of an adr
  * @param {String} adrFilename filename of the adr

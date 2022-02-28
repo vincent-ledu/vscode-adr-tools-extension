@@ -43,9 +43,19 @@
 						"description": "Destination folder for ADR",
 						"default": "./doc/adr"
 					},
+          "adr.project.directory.choose-from-marked": {
+						"type": "boolean",
+						"description": "If true, when creating a new file it will ask in which directory to create it. (Folders can be marked with .adr placeholder file)",
+						"default": false
+					},
 					"adr.log.enable": {
 						"type": "boolean",
 						"description": "true to activate logging",
+						"default": false
+					},
+          "adr.naming.timestamp": {
+						"type": "boolean",
+						"description": "true to use current timestamp instead of incremental number for file prefixing",
 						"default": false
 					}
 				}
