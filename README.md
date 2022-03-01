@@ -22,12 +22,26 @@ This extension contributes the following settings:
 * `adr.project.directory`: destination folder for ADR
 * `adr.templates.directory`: source folder where template are git cloned
 * `adr.templates.repo`: url from where templates are cloned.
+* `adr.naming.timestamp`: If set to true, then adr file names will be prefixed with timestamp instead of index
+* `adr.project.directory-choose-from-marked`: If set to true, then you can select which folder to use when you create a new adr. Theese folders will be listed if they contain .adr empty placeholder file to mark the folder as adr destination
 
 ## Known Issues
 
 This is a pre-release, for first users feedback.
 
 ## Release Notes
+
+### 0.0.5
+New awesome features:
+
+    optional timestamp based based prefix for template files (to prevent conflicts when working in team)
+    support for multiple adr folders:
+    if you add a placeholder file named .adr to the folder and you enable the new configuration property the New ADR command will ask which folder to create the adr
+
+Both features are controlled by configuration:
+
+    adr.naming.timestamp
+    adr.project.directory-choose-from-marked
 
 ### 0.0.4
 

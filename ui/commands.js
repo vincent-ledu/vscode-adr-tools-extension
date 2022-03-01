@@ -4,6 +4,7 @@ const path = require('path')
 const parsing = require('../parsing/parsingAdr')
 const graph = require('../reports/graph')
 const logger = require('../common/logger')
+const UriUtils = require('vscode-uri').Utils
 
 async function adrInit () {
   let configuredAdrProjectDirectory = path.normalize(vscode.workspace.getConfiguration().get('adr.project.directory'))
@@ -47,53 +48,83 @@ async function adrInit () {
     })
 }
 
-function adrNew () {
+async function adrNew () {
   let adrAttr = {}
-  let adrFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get('adr.project.directory'))
-  let adrTemplateFolder = path.join(vscode.workspace.rootPath, vscode.workspace.getConfiguration().get('adr.templates.directory'))
-  vscode.window
-    .showInputBox({
-      prompt: 'Enter new ADR name',
-      placeHolder: 'Choose database'
+  const rootPath = vscode.workspace.rootPath
+  let adrFolder = path.join(
+    rootPath,
+    vscode.workspace.getConfiguration().get('adr.project.directory')
+  )
+  const adrTemplateFolder = path.join(
+    rootPath,
+    vscode.workspace.getConfiguration().get('adr.templates.directory')
+  )
+  const useTimestampForFilePrefix = vscode.workspace.getConfiguration().get('adr.naming.timestamp')
+  const multiFolderSelection = vscode.workspace
+    .getConfiguration()
+    .get('adr.project.directory-choose-from-marked')
+
+  if (multiFolderSelection) {
+    const rootFolders = await vscode.workspace.findFiles('**/.adr')
+    if (rootFolders.length === 0) {
+      vscode.window.showErrorMessage("Please at least add one folder with a placeholder file `.adr` or disable adr.project.directory.choose-from-marked' setting.")
+      return
+    }
+    const paths = rootFolders.map(uri => UriUtils.dirname(uri).fsPath)
+    const selectedPath = await vscode.window.showQuickPick(paths, {
+      placeHolder: 'Select the adr folder to work with.'
     })
-    .then(srcAdrName => {
-      logger.vsLog('srcAdrName: ' + srcAdrName)
-      if (!srcAdrName) return
-      vscode.window.showQuickPick(['Accepted', 'Proposal'], { placeHolder: 'Select status for this ADR' })
-        .then(status => {
-          logger.vsLog('status: ' + status)
-          if (!status) return
-          vscode.window
-            .showQuickPick(['None', 'Supersedes', 'Amends'], {
-              placeHolder: 'Select if there is a relation with an existing ADR'
-            })
-            .then(linkType => {
-              logger.vsLog('linkType: ' + linkType)
-              if (!linkType) return
-              if (!(linkType === 'None')) {
-                vscode.window
-                  .showQuickPick(adrUtils.getAllAdr(adrFolder), {
-                    prompt: 'Enter target ADR name',
-                    placeHolder: 'Enter target ADR name'
-                  })
-                  .then(tgtAdrName => {
-                    if (!tgtAdrName) return
-                    adrAttr.srcAdrName = srcAdrName
-                    adrAttr.linkType = linkType
-                    adrAttr.tgtAdrName = tgtAdrName
-                    adrAttr.status = status
-                    let filepath = adrUtils.createNewAdr(adrAttr, adrFolder, adrTemplateFolder)
-                    vscode.workspace.openTextDocument(filepath).then(doc => vscode.window.showTextDocument(doc))
-                  })
-              } else {
-                adrAttr.srcAdrName = srcAdrName
-                adrAttr.status = status
-                let filepath = adrUtils.createNewAdr(adrAttr, adrFolder, adrTemplateFolder)
-                vscode.workspace.openTextDocument(filepath).then(doc => vscode.window.showTextDocument(doc))
-              }
-            })
-        })
-    })
+    adrFolder = selectedPath
+  }
+
+  const srcAdrName = await vscode.window.showInputBox({
+    prompt: 'Enter new ADR name',
+    placeHolder: 'E.g.: Choosed database for backend.'
+  })
+
+  logger.vsLog('srcAdrName: ' + srcAdrName)
+  if (!srcAdrName) return
+
+  const status = await vscode.window.showQuickPick(['Accepted', 'Proposal'], {
+    placeHolder: 'Select status for this ADR'
+  })
+  logger.vsLog('status: ' + status)
+
+  if (!status) return
+
+  const linkType = await vscode.window.showQuickPick(
+    ['None', 'Supersedes', 'Amends'],
+    {
+      placeHolder: 'Select if there is a relation with an existing ADR'
+    }
+  )
+
+  logger.vsLog('linkType: ' + linkType)
+  if (!linkType) return
+  if (!(linkType === 'None')) {
+    const tgtAdrName = await vscode.window.showQuickPick(
+      adrUtils.getAllAdr(adrFolder),
+      {
+        prompt: 'Enter target ADR name',
+        placeHolder: 'Enter target ADR name'
+      }
+    )
+
+    if (!tgtAdrName) return
+    adrAttr.srcAdrName = srcAdrName
+    adrAttr.linkType = linkType
+    adrAttr.tgtAdrName = tgtAdrName
+    adrAttr.status = status
+    let filepath = adrUtils.createNewAdr(adrAttr, adrFolder, adrTemplateFolder, useTimestampForFilePrefix)
+    const doc = await vscode.workspace.openTextDocument(filepath)
+    vscode.window.showTextDocument(doc)
+  } else {
+    adrAttr.srcAdrName = srcAdrName
+    adrAttr.status = status
+    let filepath = adrUtils.createNewAdr(adrAttr, adrFolder, adrTemplateFolder, useTimestampForFilePrefix)
+    const doc = await vscode.workspace.openTextDocument(filepath)
+    vscode.window.showTextDocument(doc)
+  }
 }
 
 function adrChangeStatus () {

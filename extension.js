@@ -20,8 +20,8 @@ function activate(context) {
 
   context.subscriptions.push(disposable)
 
-  disposable = vscode.commands.registerCommand('extension.adr-new', () => {
-    uiCommands.adrNew()
+  disposable = vscode.commands.registerCommand('extension.adr-new', async () => {
+    await uiCommands.adrNew()
   })
   context.subscriptions.push(disposable)
 
