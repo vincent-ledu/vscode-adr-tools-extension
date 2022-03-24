@@ -151,7 +151,7 @@ function init (adrPath, adrTemplatePath, gitRepo) {
     utils.mkDirByPathSync(adrTemplatePath)
 
     const cp = require('child_process')
-    let result = cp.execSync('git clone ' + gitRepo + ' ' + adrTemplatePath, { stdio: 'inherit' })
+    let result = cp.execSync('git clone ' + gitRepo + ' \'' + adrTemplatePath + '\'', { stdio: 'inherit' })
     logger.vsLog(result)
   } else {
     // TODO : find something to do...
